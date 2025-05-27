@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<config>
+	<fieldset name="API_CONNECTIONS">
+		<field
+				name="apis"
+				type="subform"
+				label="COM_VMMAPICON_FIELD_APIS_LABEL"
+				multiple="true"
+				layout="joomla.form.field.subform.repeatable"
+		>
+			<form>
+				<field
+						name="api-title"
+						type="text"
+						label="COM_VMMAPICON_FIELD_APITITLE_LABEL"
+						description="COM_VMMAPICON_FIELD_APITITLE_DESC"
+						default=""
+						required="true"
+				/>
+				<field
+						name="api-url"
+						type="text"
+						label="COM_VMMAPICON_FIELD_APIURL_LABEL"
+						description="COM_VMMAPICON_FIELD_APIURL_DESC"
+						class="input-xxlarge"
+						default=""
+						required="true"
+				/>
+				<field
+						name="api-params"
+						type="subform"
+						label="COM_VMMAPICON_FIELD_APIPARAMS_LABEL"
+						multiple="true"
+						layout="joomla.form.field.subform.repeatable"
+				>
+					<form>
+						<field
+								name="key"
+								type="text"
+								label="COM_VMMAPICON_FIELD_APIPARAMS_KEY_LABEL"
+								required="true"
+						/>
+						<field
+								name="value"
+								type="textarea"
+								label="COM_VMMAPICON_FIELD_APIPARAMS_VALUE_LABEL"
+								rows="5"
+								filter="raw"
+						/>
+						<field
+								name="position"
+								type="list"
+								label="COM_VMMAPICON_FIELD_APIPARAMS_POSITION_LABEL"
+								default="header"
+						>
+							<option value="header">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_HEADER</option>
+							<option value="body">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_BODY</option>
+							<option value="params">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_PARAMS</option>
+						</field>
+					</form>
+				</field>
+			</form>
+		</field>
+	</fieldset>
+
+    <fieldset
+		name="permissions"
+		label="JCONFIG_PERMISSIONS_LABEL"
+		description="JCONFIG_PERMISSIONS_DESC"
+		>
+		<field
+			name="rules"
+			type="rules"
+			label="JCONFIG_PERMISSIONS_LABEL"
+			validate="rules"
+			filter="rules"
+			component="com_vmmapicon"
+			section="component"
+		/>
+	</fieldset>
+</config>

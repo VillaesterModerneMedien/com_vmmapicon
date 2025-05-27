@@ -1,0 +1,49 @@
+{
+    "@import": "./element.php",
+    "name": "form_immo",
+    "title": "Formular Immobilienanfrage",
+    "group": "api connector",
+    "icon": "${url:images/icon.svg}",
+    "iconSmall": "${url:images/iconSmall.svg}",
+    "element": true,
+    "width": 500,
+    "defaults": {
+        "margin": "default",
+        "column_breakpoint": "m"
+    },
+    "templates": {
+        "render": "./templates/template.php",
+        "content": "./templates/content.php"
+    },
+    "fields": {
+        "exposeeId": {
+            "label": "Exposee ID",
+            "type": "text",
+            "source": true
+        },
+        "exposeeTitle": {
+            "label": "Exposee Title",
+            "type": "text",
+            "source": true
+        },
+        "exposeeContact": {
+            "label": "Exposee Kontakt",
+            "type": "text",
+            "source": true
+        },
+        "transform": "${builder.transform}"
+    },
+    "fieldset": {
+        "default": {
+            "type": "tabs",
+            "fields": [
+                {
+                    "title": "Content",
+                    "fields": ["exposeeContact", "exposeeId", "exposeeTitle"]
+                },
+
+                "${builder.advanced}"
+            ]
+        }
+    }
+}
