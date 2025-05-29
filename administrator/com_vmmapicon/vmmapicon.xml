@@ -56,13 +56,6 @@
 			COM_VMMAPICON
 		</menu>
 		<submenu>
-			<menu view="apis">
-				COM_VMMAPICON_APIS
-				<params>
-					<menu-quicktask-title>COM_VMMAPICON_NEW_API</menu-quicktask-title>
-					<menu-quicktask>index.php?option=com_vmmapicon&amp;task=api.add</menu-quicktask>
-				</params>
-			</menu>
 			<menu link="option=com_config&amp;view=component&amp;component=com_vmmapicon">
 				COM_VMMAPICON_SETTINGS
 			</menu>

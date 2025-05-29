@@ -30,15 +30,12 @@ use YOOtheme\Url;
 
 class SourceListener
 {
-
-
-
     public function initCustomizer( $config)
     {
         $config->merge([
             'templates' => [
                 'com_vmmapicon.api' => [
-                    'label' => 'Api Single',
+                    'label' => 'Api Result Singleview',
                     'fieldset' => [
                         'default' => [
                             'fields' => [
@@ -49,7 +46,7 @@ class SourceListener
                 ],
 
                 'com_vmmapicon.apis' => [
-                    'label' => 'Api List',
+                    'label' => 'Api Results Blogview',
                     'fieldset' => [
                         'default' => [
                             'fields' => [

@@ -28,8 +28,6 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\User\UserHelper;
 
-
-
 $params = ComponentHelper::getParams('com_vmmapicon');
 
 ?>

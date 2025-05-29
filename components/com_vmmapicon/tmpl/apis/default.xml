@@ -16,37 +16,7 @@
 			   type="Apis"
 			   label="API Auswählen"
 			   default="apis0"
-
 		/>
 		</fieldset>
-	</fields>
-
-	<!-- Add fields to the parameters object for the layout. -->
-	<fields name="params">
-
-		<fieldset name="advanced" label="JGLOBAL_BLOG_LAYOUT_OPTIONS" description="JGLOBAL_SUBSLIDER_BLOG_LAYOUT_LABEL">
-
-
-		</fieldset>
-
-		<fieldset name="article"
-			label="COM_CONTENT_ATTRIBS_FIELDSET_LABEL"
-			addfieldprefix="Joomla\Component\Content\Administrator\Field"
-		>
-
-			<field
-				name="article_layout"
-				type="componentlayout"
-				label="JGLOBAL_FIELD_LAYOUT_LABEL"
-				description="JGLOBAL_FIELD_LAYOUT_DESC"
-				class="form-select"
-				menuitems="true"
-				extension="com_content"
-				view="article"
-			/>
-
-
-		</fieldset>
-
 	</fields>
 </metadata>

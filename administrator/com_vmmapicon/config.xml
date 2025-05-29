@@ -29,6 +29,23 @@
 						required="true"
 				/>
 				<field
+						name="api-method"
+						type="list"
+						label="COM_VMMAPICON_FIELD_APIMETHOD_LABEL"
+						description="COM_VMMAPICON_FIELD_APIMETHOD_LABEL"
+						class="input-xxlarge"
+						default=""
+						required="true"
+				>
+					<option value="GET">GET</option>
+					<option value="POST">POST</option>
+					<option value="PUT">PUT</option>
+					<option value="PATCH">PATCH</option>
+					<option value="DELETE">DELETE</option>
+					<option value="HEAD">HEAD</option>
+					<option value="OPTIONS">OPTIONS</option>
+				</field>
+				<field
 						name="api-params"
 						type="subform"
 						label="COM_VMMAPICON_FIELD_APIPARAMS_LABEL"
@@ -53,11 +70,11 @@
 								name="position"
 								type="list"
 								label="COM_VMMAPICON_FIELD_APIPARAMS_POSITION_LABEL"
-								default="header"
+								default="head"
 						>
-							<option value="header">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_HEADER</option>
+							<option value="head">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_HEADER</option>
 							<option value="body">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_BODY</option>
-							<option value="params">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_PARAMS</option>
+							<option value="url">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_PARAMS</option>
 						</field>
 					</form>
 				</field>
