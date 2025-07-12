@@ -9,7 +9,7 @@
  *     \/   |_|  |_|_|  |_| Villaester Moderne Medien GmbH
  *
  * @package     Joomla.Component
- * @subpackage  com_vmmapico
+ * @subpackage  com_vmmapicon
  * @copyright   Copyright (C) 2025 Villaester Moderne Medien
  * @author      Mario Hewera & Kiki Schuelling
  * @license     GNU General Public License version 2 or later
@@ -68,13 +68,13 @@ return new class implements ServiceProviderInterface
 			function (Container $container)
             {
 				$component = new VmmapiconComponent($container->get(ComponentDispatcherFactoryInterface::class));
-                
+
 				$component->setRegistry($container->get(Registry::class));
 				$component->setMVCFactory($container->get(MVCFactoryInterface::class));
 				$component->setCategoryFactory($container->get(CategoryFactoryInterface::class));
                 $component->setAssociationExtension($container->get(AssociationExtensionInterface::class));
 				$component->setRouterFactory($container->get(RouterFactoryInterface::class));
-                
+
 				return $component;
 			}
 		);

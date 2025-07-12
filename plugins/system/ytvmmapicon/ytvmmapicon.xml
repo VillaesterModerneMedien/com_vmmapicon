@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="plugin" version="3.8" group="system" method="upgrade">
+<extension type="plugin" version="1.0" group="system" method="upgrade">
   <name>PLG_YTVMMAPICON</name>
-  <creationDate>[DATE]</creationDate>
-  <author>[AUTHOR]</author>
-  <authorEmail>[AUTHOR_EMAIL]</authorEmail>
-  <authorUrl>[AUTHOR_URL]</authorUrl>
-  <copyright>[COPYRIGHT]</copyright>
+  <creationDate>29.05.2025</creationDate>
+  <author>Mario Hewera</author>
+  <authorEmail>mh@villaester.de</authorEmail>
+  <authorUrl>https://villaester.de</authorUrl>
   <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-  <version>[VERSION]</version>
+  <version>1.0</version>
   <description>PLG_YTDATASET_XML_DESCRIPTION</description>
   <namespace path="src">Joomla\Plugin\System\Ytvmmapicon</namespace>
 
   <!-- Language files -->
   <languages folder="language">
-    <language tag="en-GB">en-GB/en-GB.plg_system_ytvmmapicon.ini</language>
-    <language tag="en-GB">en-GB/en-GB.plg_system_ytvmmapicon.sys.ini</language>
+    <language tag="de-DE">de-DE/de-DE.plg_system_ytvmmapicon.ini</language>
+    <language tag="de-DE">de-DE/de-DE.plg_system_ytvmmapicon.sys.ini</language>
   </languages>
 
   <!-- Plugin files -->
@@ -23,6 +22,7 @@
     <filename>bootstrap.php</filename>
     <folder>language</folder>
     <folder>src</folder>
+
   </files>
 
   <config>

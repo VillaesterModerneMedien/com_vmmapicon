@@ -36,7 +36,7 @@ class ApiQueryType
                 'api' => [
                     'type' => 'Api',
                     'metadata' => [
-                        'label' => 'Api (Single)',
+                        'label' => 'Api Response Single',
                         'view' => ['com_vmmapicon.api'],
                         'group' => 'Apis',
                     ],

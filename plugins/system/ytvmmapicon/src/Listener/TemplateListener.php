@@ -28,7 +28,7 @@ class TemplateListener
 
     public function __construct(?Document $document)
     {
-        $this->language = $document->language ?? 'en-gb';
+        $this->language = $document->language ?? 'de-de';
     }
     public static function matchTemplate($view, $tpl)
     {
@@ -52,7 +52,7 @@ class TemplateListener
 
         // match context and layout from view object
         if ($context === 'com_vmmapicon.apis' && $layout === 'default' && !$tpl) {
-
+$a = 'bla';
             // return type, query and parameters of the matching view
             return [
                 'type' => $context,

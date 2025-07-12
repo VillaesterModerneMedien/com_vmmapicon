@@ -73,44 +73,7 @@ class DisplayController extends BaseController
 	 */
 	public function display($cachable = false, $urlparams = array())
 	{
-		$app = Factory::getApplication();
-		$dashUrl = Route::_('index.php');
-		$app->redirect($dashUrl);
-
-		return $this;
-
+		return parent::display();
 	}
-	
-	/**
-	 * Fetch and process ajax calls
-     * Delete if you don't use ajax
-     *
-     * @since 1.0.0
-	 */
-	public function ajax()
-	{
-		// Set whether a client disconnect should abort script execution
-		ignore_user_abort(true);
-		$app = Factory::getApplication();
-		$input = $app->input;
-		
-		$action = $this->input->get('action', '', 'CMD');
-		
-		switch ($action)
-		{
-			// case 'my_action': ...
-			//		$result = doSomethingImportant();
-			//		if ($result !== null)
-            //        {
-            //            echo '{"result" : "true", "data" : "' . $result . '"}';
-            //        }
-            //        else {
-            //            echo '{"result" : "true", "data" : "false"}';
-            //        }
-			//			break;
-			default: echo '{"result" : "true", "data" : "false"}';
-		}
-		
-		return;
-	}
+
 }

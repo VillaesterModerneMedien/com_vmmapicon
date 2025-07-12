@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+    <fieldset addfieldprefix="Villaester\Component\Vmmapicon\Administrator\Field">
+        <field
+            name="id"
+            type="text"
+            label="JGLOBAL_FIELD_ID_LABEL"
+            default="0"
+            class="readonly"
+            readonly="true"
+        />
+
+        <field
+            name="published"
+            type="list"
+            label="JSTATUS"
+            default="1"
+            class="form-select-color-state"
+            validate="options"
+            >
+            <option value="1">JPUBLISHED</option>
+            <option value="0">JUNPUBLISHED</option>
+            <option value="2">JARCHIVED</option>
+            <option value="-2">JTRASHED</option>
+        </field>
+        <field
+                name="title"
+                type="text"
+                label="COM_VMMAPICON_FIELD_APITITLE_LABEL"
+                description="COM_VMMAPICON_FIELD_APITITLE_DESC"
+                default=""
+                required="true"
+        />
+        <field
+                name="api-url"
+                type="text"
+                label="COM_VMMAPICON_FIELD_APIURL_LABEL"
+                description="COM_VMMAPICON_FIELD_APIURL_DESC"
+                class="input-xxlarge"
+                default=""
+                required="true"
+        />
+        <field
+                name="api-method"
+                type="list"
+                label="COM_VMMAPICON_FIELD_APIMETHOD_LABEL"
+                description="COM_VMMAPICON_FIELD_APIMETHOD_LABEL"
+                class="input-xxlarge"
+                default=""
+                required="true"
+        >
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+            <option value="HEAD">HEAD</option>
+            <option value="OPTIONS">OPTIONS</option>
+        </field>
+    </fieldset>
+
+    <fieldset name="apiParams">
+        <field
+        name="api-url"
+        type="text"
+        label="API URL"
+        description="API Endpoint URL eingeben"
+        default=""
+        />
+        <field
+        name="api-method"
+        type="list"
+        label="API Method"
+        description="APIMethode auswählen"
+        default="">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+            <option value="HEAD">HEAD</option>
+            <option value="OPTIONS">OPTIONS</option>
+        </field>
+        <field
+            name="api-mapping"
+            type="textarea"
+            label="API Mapping"
+            description="API Mapping eingeben"
+            required="true"
+        />
+        <field
+                name="api-params"
+                type="subform"
+                label="COM_VMMAPICON_FIELD_APIPARAMS_LABEL"
+                multiple="true"
+                layout="joomla.form.field.subform.repeatable"
+        >
+            <form>
+                <field
+                        name="key"
+                        type="text"
+                        label="COM_VMMAPICON_FIELD_APIPARAMS_KEY_LABEL"
+                        required="true"
+                />
+                <field
+                        name="value"
+                        type="textarea"
+                        label="COM_VMMAPICON_FIELD_APIPARAMS_VALUE_LABEL"
+                        rows="5"
+                        filter="raw"
+                        required="true"
+                />
+                <field
+                        name="position"
+                        type="list"
+                        label="COM_VMMAPICON_FIELD_APIPARAMS_POSITION_LABEL"
+                        default="head"
+                >
+                    <option value="head">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_HEADER</option>
+                    <option value="body">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_BODY</option>
+                    <option value="url">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_PARAMS</option>
+                </field>
+                <field
+                        name="api-type"
+                        type="list"
+                        label="API Typ"
+                        description="Api Typen angeben"
+                        default="">
+                    <option value="json">JSON</option>
+                    <option value="jsonp">JSONP</option>
+                    <option value="xml">XML</option>
+                    <option value="csv">CSV</option>
+                </field>
+            </form>
+        </field>
+    </fieldset>
+</form>

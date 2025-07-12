@@ -25,9 +25,9 @@ use YOOtheme\Application;
 defined('_JEXEC') or die;
 
 /**
-* StudiogongDataset plugin.
+* Api-Dataset plugin.
 *
-* @package   plg_system_ytdataset
+* @package   plg_system_ytvmmapicon
 * @since     1.0.0
 */
 class plgSystemYtvmmapicon extends CMSPlugin

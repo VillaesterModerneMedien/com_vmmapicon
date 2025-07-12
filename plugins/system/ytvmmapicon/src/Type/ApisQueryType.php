@@ -23,6 +23,7 @@ namespace Joomla\Plugin\System\Ytvmmapicon\Type;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\Plugin\System\Ytvmmapicon\ApisTypeProvider;
+use Joomla\Utilities\ArrayHelper;
 use Villaester\Component\Vmmapicon\Site\Helper\RouteHelper;
 
 class ApisQueryType
@@ -30,25 +31,21 @@ class ApisQueryType
     public static function config()
     {
         return [
-
             'fields' => [
-
                 'apis' => [
                     'type' => [
                         'listOf' => 'Apis',
                     ],
                     'metadata' => [
-                        'label' => 'Apis (List)',
+                        'label' => 'Api Response',
                         'view' => ['com_vmmapicon.apis'],
-                        'group' => 'Apis',
+                        'group' => 'Api Connections',
                     ],
                     'extensions' => [
                         'call' => __CLASS__ . '::apis',
                     ],
                 ],
-
             ]
-
         ];
     }
 
@@ -67,44 +64,26 @@ class ApisQueryType
         $mvcFactory = $app->bootComponent('com_vmmapicon')->getMVCFactory();
         /** @var \Villaester\Component\Vmmapicon\Site\Model\ApisModel $apisModel */
         $apisModel = $mvcFactory->createModel('Apis', 'Site', ['ignore_request' => true]);
-        $apis = $apisModel->getItems(true);
-
-        $apisRemapped = [];
+        $response= $apisModel->getItems();
+		$responseList = is_array($response) ? $response : json_decode($response, true);
 
         $menu = Factory::getApplication()->getMenu()->getActive();
+	    $Itemid = $menu->id;
 
-        foreach ($apis as $api) {
-
-            $Itemid = $menu->id;
-            $route = RouteHelper::getApiRoute($api->{'@id'});
-            $url = Route::_('index.php?option=com_vmmapicon&view=api&apiID=' . (int)$api->{'@id'} . '&Itemid=' . $Itemid);
-
-            $apisRemapped[] = [
-                'id' => $api->{'@id'},
-                'title' => $api->title,
-                'type' => $api->{'@xsi.type'},
-                'externalId' => $api->externalId,
-                'creationDate' => $api->{'@creation'},
-                'modifiedDate' => $api->{'@modification'},
-                'apiRoute' => $route,
-                'apiUrl' => $url,
-                'street' => $api->address->street,
-                'houseNumber' => $api->address->houseNumber,
-                'zipCode' => $api->address->postcode,
-                'city' => $api->address->city,
-                'livingSpace' => $api->livingSpace,
-                'numberOfRooms' => $api->numberOfRooms,
-                'price' => $api->price->value,
-                'currency' => $api->price->currency,
-                'apiState' => $api->realEstateState,
-                'titlePicture' => $api->titlePicture,
-                'titlePictureUrl' => strstr($api->titlePicture->urls[0]->url[0]->{'@href'}, '/ORIG', true),
-            ];
+	   /* $resultMapping = [];
+        foreach ($responseList as $responseItem => $value)
+        {
+	        if (is_array($value))
+	        {
+		        $resultMapping[$responseItem] = ArrayHelper::flatten($value);
+	        }
+	        else
+	        {
+		        $resultMapping[$responseItem] = $value;
+	        }
         }
-
-        return $apisRemapped;
-
-
+		*/
+        return $responseList;
     }
 
 }
