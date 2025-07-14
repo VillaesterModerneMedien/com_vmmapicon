@@ -4,18 +4,16 @@
 CREATE TABLE IF NOT EXISTS `#__vmmapicon_apis`
 (
     `id`          int(11) unsigned                        NOT NULL AUTO_INCREMENT,
-    `title`   varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-    `api_url`     text COLLATE utf8mb4_unicode_ci         NOT NULL,
-    `api_method`  varchar(10) COLLATE utf8mb4_unicode_ci  NOT NULL DEFAULT 'GET',
-    `api_params`  json                                    NULL,
+    `title`       varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+    `api-url`     text COLLATE utf8mb4_unicode_ci         NOT NULL,
+    `api-method`  varchar(10) COLLATE utf8mb4_unicode_ci  NOT NULL DEFAULT 'GET',
+    `api-params`  longtext                                    NULL,
+    `api-mapping` longtext                                    NULL,
     `published`   tinyint(4)                              NOT NULL DEFAULT '1',
     `created`     datetime                                NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `created_by`  int(11)                                 NOT NULL DEFAULT '0',
     `modified`    datetime                                NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `modified_by` int(11)                                 NOT NULL DEFAULT '0',
-    `checked_out` int(11)                                 NOT NULL DEFAULT '0',
-    `checked_out_time` datetime                           NULL DEFAULT NULL,
-    `ordering`    int(11)                                 NOT NULL DEFAULT '0',
     `access`      int(11)                                 NOT NULL DEFAULT '1',
 
     PRIMARY KEY (`id`),

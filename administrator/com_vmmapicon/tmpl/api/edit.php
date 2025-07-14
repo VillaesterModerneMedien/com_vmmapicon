@@ -26,7 +26,7 @@ $wa->useScript('keepalive')
 $layout  = 'edit';
 $tmpl = $input->get('tmpl', '', 'cmd') === 'component' ? '&tmpl=component' : '';
 ?>
-<div class="dnbooking dnbooking_api">
+<div>
 	<form action="<?php echo Route::_('index.php?option=com_vmmapicon&layout=' . $layout . $tmpl . '&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="adminForm" class="form-validate">
 		<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
 

@@ -226,8 +226,6 @@ class ApiModel extends AdminModel
 	{
 		$date = Factory::getDate()->toSql();
 
-		$table->generateAlias();
-
 		if (empty($table->id))
 		{
 			// Set the values

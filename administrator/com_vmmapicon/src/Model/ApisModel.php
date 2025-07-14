@@ -134,11 +134,6 @@ class ApisModel extends ListModel
 			}
 		}
 
-		// Add the list ordering clause
-		$orderCol = $this->state->get('list.ordering', 'a.ordering');
-		$orderDirn = $this->state->get('list.direction', 'ASC');
-		$query->order($db->escape($orderCol . ' ' . $orderDirn));
-
 		return $query;
 	}
 

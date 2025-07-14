@@ -11,8 +11,12 @@ namespace Villaester\Component\Vmmapicon\Administrator\Table;
 
 \defined('_JEXEC') or die;
 
+use DnbookingNamespace\Component\Dnbooking\Administrator\Helper\DnbookingHelper;
+use Joomla\CMS\Access\Rules;
+use Joomla\CMS\Event\AbstractEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Table\Asset;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Tag\TaggableTableInterface;
 use Joomla\CMS\Tag\TaggableTableTrait;
@@ -20,6 +24,7 @@ use Joomla\CMS\Versioning\VersionableTableInterface;
 use Joomla\Database\DatabaseDriver;
 use Joomla\CMS\Language\Text;
 use Joomla\Registry\Registry;
+use Joomla\String\StringHelper;
 
 /**
  * Api Table class.
@@ -72,5 +77,24 @@ class ApiTable extends Table implements VersionableTableInterface, TaggableTable
     {
         return $this->typeAlias;
     }
+	/**
+	 * Method to store a row in the database from the Table instance properties.
+	 *
+	 * If a primary key value is set the row with that primary key value will be updated with the instance property values.
+	 * If no primary key value is set a new row will be inserted into the database with the properties from the Table instance.
+	 *
+	 * @param   boolean  $updateNulls  True to update fields even if they are null.
+	 *
+	 * @return  boolean  True on success.
+	 *
+	 * @since   1.7.0
+	 */
+	public function store($updateNulls = false)
+	{
+
+		$this->{'api-params'} = json_encode($this->{'api-params'});
+
+		return parent::store($updateNulls);
+	}
 
 }

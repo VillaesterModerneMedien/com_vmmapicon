@@ -59,7 +59,7 @@
         </field>
     </fieldset>
 
-    <fieldset name="apiParams">
+    <fieldset name="apiParams"  addfieldprefix="Villaester\Component\Vmmapicon\Administrator\Field\Jsonselector">
         <field
         name="api-url"
         type="text"
@@ -81,6 +81,24 @@
             <option value="HEAD">HEAD</option>
             <option value="OPTIONS">OPTIONS</option>
         </field>
+        <field
+                name="api-type"
+                type="list"
+                label="API Typ"
+                description="Api Antworttyp angeben"
+                default="">
+            <option value="json">JSON</option>
+            <option value="jsonp">JSONP</option>
+            <option value="xml">XML</option>
+            <option value="csv">CSV</option>
+        </field>
+        <field
+            name="jsonknoten"
+            type="Jsonselector"
+            label="JSON Knoten"
+            description="JSON Knoten auswählen"
+            default=""
+        />
         <field
             name="api-mapping"
             type="textarea"
@@ -109,6 +127,14 @@
                         rows="5"
                         filter="raw"
                         required="true"
+                        showon="position:head,body"
+                />
+                <field
+                        name="value"
+                        type="url"
+                        label="COM_VMMAPICON_FIELD_APIPARAMS_VALUE_LABEL2"
+                        required="true"
+                        showon="position:url"
                 />
                 <field
                         name="position"
@@ -119,17 +145,6 @@
                     <option value="head">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_HEADER</option>
                     <option value="body">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_BODY</option>
                     <option value="url">COM_VMMAPICON_FIELD_APIPARAMS_POSITION_VALUE_PARAMS</option>
-                </field>
-                <field
-                        name="api-type"
-                        type="list"
-                        label="API Typ"
-                        description="Api Typen angeben"
-                        default="">
-                    <option value="json">JSON</option>
-                    <option value="jsonp">JSONP</option>
-                    <option value="xml">XML</option>
-                    <option value="csv">CSV</option>
                 </field>
             </form>
         </field>
