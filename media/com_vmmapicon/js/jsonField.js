@@ -1,11 +1,9 @@
 const ApiMapper = {
-
-    apiData: {apiData},
-
     cmsFields: {},
     availableTypes: ['String', 'Number', 'Boolean', 'Date', 'Object'],
 
-    init(containerId) {
+    init(containerId, apiData) {
+        this.apiData = apiData;
         this.container = document.getElementById(containerId);
         this.loadApiData();
         this.renderFields();
@@ -89,6 +87,9 @@ const ApiMapper = {
 
 let apiData = '';
 document.addEventListener('DOMContentLoaded', () => {
-    apiData = Joomla.getOptions('com_vmmapicon');
-    ApiMapper.init('api-mapper');
+    const options = Joomla.getOptions('com_vmmapicon');
+    const apiData = options && options.apiData ? options.apiData : {}; // Fallback
+    console.log('apiData', apiData);
+    console.log('options', options);
+    ApiMapper.init('api-mapper', apiData);
 });

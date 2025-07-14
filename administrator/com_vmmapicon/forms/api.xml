@@ -126,16 +126,8 @@
                         label="COM_VMMAPICON_FIELD_APIPARAMS_VALUE_LABEL"
                         rows="5"
                         filter="raw"
-                        required="true"
-                        showon="position:head,body"
                 />
-                <field
-                        name="value"
-                        type="url"
-                        label="COM_VMMAPICON_FIELD_APIPARAMS_VALUE_LABEL2"
-                        required="true"
-                        showon="position:url"
-                />
+
                 <field
                         name="position"
                         type="list"

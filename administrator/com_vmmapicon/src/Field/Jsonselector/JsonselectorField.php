@@ -50,10 +50,8 @@ class JsonselectorField extends FormField
 		$apiConfig = $vmmApiconHelper->getApiConfig();
 
 		$data = $this->getLayoutData();
-
 		$data['apiResult'] = $apiHelper->getApiResult($apiConfig);
-
-
+		
 	    return $this->getRenderer($this->layout)->render($data);
     }
 }
