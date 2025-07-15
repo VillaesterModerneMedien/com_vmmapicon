@@ -7,6 +7,7 @@ use Joomla\CMS\Form\FormField;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Http\HttpFactory;
 use Joomla\CMS\Object\CMSObject;
+use Joomla\Utilities\ArrayHelper;
 use Villaester\Component\Vmmapicon\Administrator\Helper\ApiHelper;
 use Villaester\Component\Vmmapicon\Administrator\Helper\VmmapiconHelper;
 
@@ -42,6 +43,53 @@ class JsonselectorField extends FormField
 	 */
 	protected $renderLabelLayout = 'vmm.form.renderlabel';
 
+	protected function _getJsonKeys($json){
+		// JSON dekodieren falls es ein String ist
+		if (is_string($json)) {
+			$array = json_decode($json, true);
+			if (json_last_error() !== JSON_ERROR_NONE) {
+				return [];
+			}
+		} else {
+			$array = $json;
+		}
+
+		// Alle Keys rekursiv sammeln
+		$allKeys = [];
+		$this->collectKeysRecursive($array, $allKeys);
+
+		// Unique Keys zurückgeben
+		$uniqueKeys = array_unique($allKeys);
+
+		return $uniqueKeys;
+	}
+
+	/**
+	 * Rekursive Hilfsmethode zum Sammeln aller Keys
+	 */
+	private function collectKeysRecursive($data, &$keys) {
+		if (is_array($data)) {
+			foreach ($data as $key => $value) {
+				// Nur String-Keys hinzufügen (keine numerischen Array-Indizes)
+				if (is_string($key)) {
+					$keys[] = $key;
+				}
+
+				// Rekursiv in verschachtelte Strukturen schauen
+				if (is_array($value) || is_object($value)) {
+					$this->collectKeysRecursive($value, $keys);
+				}
+			}
+		} elseif (is_object($value)) {
+			foreach ($value as $key => $val) {
+				$keys[] = $key;
+				if (is_array($val) || is_object($val)) {
+					$this->collectKeysRecursive($val, $keys);
+				}
+			}
+		}
+	}
+
     protected function getInput()
     {
 		$apiHelper = new ApiHelper();
@@ -50,8 +98,9 @@ class JsonselectorField extends FormField
 		$apiConfig = $vmmApiconHelper->getApiConfig();
 
 		$data = $this->getLayoutData();
-		$data['apiResult'] = $apiHelper->getApiResult($apiConfig);
-		
+        $keysFormatted = $this->_getJsonKeys($apiHelper->getApiResult($apiConfig));
+		$data['apiResult'] = $keysFormatted;
+
 	    return $this->getRenderer($this->layout)->render($data);
     }
 }

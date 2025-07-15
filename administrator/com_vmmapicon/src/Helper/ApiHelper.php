@@ -98,60 +98,6 @@ use Joomla\Utilities\ArrayHelper;
 
 		    curl_close($curl);
 
-		    $response = <<<'JSON'
-{
-  "data": [
-    {
-      "type": "articles",
-      "id": "581",
-      "attributes": {
-        "id": 581,
-        "asset_id": 767,
-        "title": "New drilling rig HBR201 for underground",
-        "alias": "new-drilling-rig-hbr201",
-        "state": 1,
-        "access": 1,
-        "created": "2025-02-26 10:33:58",
-        "created_by": 545,
-        "created_by_alias": "",
-        "modified": "2025-05-21 08:25:56",
-        "featured": 0,
-        "language": "en-GB",
-        "hits": 36,
-        "publish_up": "2025-02-26 07:39:11",
-        "publish_down": null,
-        "note": "",
-        "images": {
-          "image_intro": "",
-          "image_intro_alt": "",
-          "float_intro": "",
-          "image_intro_caption": "",
-          "image_fulltext": "",
-          "image_fulltext_alt": "",
-          "float_fulltext": "",
-          "image_fulltext_caption": ""
-        },
-        "metakey": "",
-        "metadesc": "",
-        "metadata": {
-          "robots": "",
-          "author": "",
-          "rights": ""
-        },
-        "version": 6,
-        "featured_up": null,
-        "featured_down": null,
-        "typeAlias": "com_content.article",
-        "text": "<p><strong>Undergound exploration drilling with \"Hütte Bohrtechnik\".</strong></p>\r\n<p>THYSSEN SCHACHTBAU has acquired a new HBR201 drilling rig...</p>",
-        "testfeld": "testinhalt",
-        "bilder": "{\"row0\":{\"field2\":{\"imagefile\":\"images/2021/03/10/tsi-logo3.jpg#joomlaImage://local-images/2021/03/10/tsi-logo3.jpg?width=822&height=822\",\"alt_text\":\"\"}}}",
-        "article-field": "",
-        "tags": []
-      }
-    }
-  ]
-}
-JSON;
 		    return $response;
 	    }
     }

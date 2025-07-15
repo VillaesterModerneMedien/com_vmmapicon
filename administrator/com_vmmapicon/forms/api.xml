@@ -93,15 +93,34 @@
             <option value="csv">CSV</option>
         </field>
         <field
-            name="jsonknoten"
-            type="Jsonselector"
-            label="JSON Knoten"
-            description="JSON Knoten auswählen"
-            default=""
-        />
+                name="api-mapping-subform"
+                type="subform"
+                label="MappingsTest"
+                multiple="true"
+                layout="joomla.form.field.subform.repeatable"
+        >
+            <form>
+                <field
+                        name="JsonKey"
+                        type="text"
+                        label="JaonKey"
+                />
+                <field
+                        name="ytlabel"
+                        type="text"
+                        label="yoothemeLabel"
+                />
+                <field
+                        name="ytname"
+                        type="text"
+                        label="yoothemeName"
+                />
+
+            </form>
+        </field>
         <field
             name="api-mapping"
-            type="textarea"
+            type="Jsonselector"
             label="API Mapping"
             description="API Mapping eingeben"
             required="true"

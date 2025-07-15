@@ -60,7 +60,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                     </a>
                                 </td>
                                 <td class="d-none d-md-table-cell">
-                                    <?php echo HTMLHelper::_('jgrid.published', $item->state, $i, 'apis.', true); ?>
+                                    <?php echo HTMLHelper::_('jgrid.published', $item->published, $i, 'apis.', true); ?>
                                 </td>
                                 <td class="d-none d-md-table-cell">
                                     <?php echo $item->id; ?>

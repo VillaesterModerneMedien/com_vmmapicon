@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS `#__vmmapicon_apis`
     PRIMARY KEY (`id`),
     KEY `idx_published` (`published`),
     KEY `idx_access` (`access`),
-    KEY `idx_checkout` (`checked_out`),
     KEY `idx_created_by` (`created_by`),
     KEY `idx_api_method` (`api_method`),
     KEY `idx_ordering` (`ordering`)

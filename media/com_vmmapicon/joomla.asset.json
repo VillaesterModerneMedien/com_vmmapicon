@@ -8,7 +8,10 @@
     {
       "name": "com_vmmapicon.jsonselector",
       "type": "script",
-      "uri": "com_vmmapicon/jsonField.js"
+      "uri": "com_vmmapicon/jsonField.js",
+      "attributes": {
+        "defer": true
+      }
     }
   ]
 }
