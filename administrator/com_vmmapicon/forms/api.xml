@@ -32,7 +32,7 @@
                 required="true"
         />
         <field
-                name="api-url"
+                name="api_url"
                 type="text"
                 label="COM_VMMAPICON_FIELD_APIURL_LABEL"
                 description="COM_VMMAPICON_FIELD_APIURL_DESC"
@@ -41,7 +41,7 @@
                 required="true"
         />
         <field
-                name="api-method"
+                name="api_method"
                 type="list"
                 label="COM_VMMAPICON_FIELD_APIMETHOD_LABEL"
                 description="COM_VMMAPICON_FIELD_APIMETHOD_LABEL"
@@ -61,14 +61,14 @@
 
     <fieldset name="apiParams"  addfieldprefix="Villaester\Component\Vmmapicon\Administrator\Field\Jsonselector">
         <field
-        name="api-url"
+        name="api_url"
         type="text"
         label="API URL"
         description="API Endpoint URL eingeben"
         default=""
         />
         <field
-        name="api-method"
+        name="api_method"
         type="list"
         label="API Method"
         description="APIMethode auswählen"
@@ -93,7 +93,7 @@
             <option value="csv">CSV</option>
         </field>
         <field
-                name="api-mapping-subform"
+                name="api_mapping-subform"
                 type="subform"
                 label="MappingsTest"
                 multiple="true"
@@ -119,14 +119,14 @@
             </form>
         </field>
         <field
-            name="api-mapping"
+            name="api_mapping"
             type="Jsonselector"
             label="API Mapping"
             description="API Mapping eingeben"
             required="true"
         />
         <field
-                name="api-params"
+                name="api_params"
                 type="subform"
                 label="COM_VMMAPICON_FIELD_APIPARAMS_LABEL"
                 multiple="true"

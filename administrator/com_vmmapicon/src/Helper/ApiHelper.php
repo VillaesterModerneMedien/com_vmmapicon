@@ -78,18 +78,18 @@ use Joomla\Utilities\ArrayHelper;
 	     */
 	    public static function getApiResult($apiConfig)
 	    {
-		    $apiParams = self::_formatParams($apiConfig->{'api-params'});
+		    $apiParams = self::_formatParams($apiConfig->{'api_params'});
 		    $curl = curl_init();
 
 		    curl_setopt_array($curl, array(
-			    CURLOPT_URL            => $apiConfig->{'api-url'} . '?' . $apiParams['url'],
+			    CURLOPT_URL            => $apiConfig->{'api_url'} . '?' . $apiParams['url'],
 			    CURLOPT_RETURNTRANSFER => true,
 			    CURLOPT_ENCODING       => '',
 			    CURLOPT_MAXREDIRS      => 10,
 			    CURLOPT_TIMEOUT        => 0,
 			    CURLOPT_FOLLOWLOCATION => true,
 			    CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-			    CURLOPT_CUSTOMREQUEST  => $apiConfig->{'api-method'},
+			    CURLOPT_CUSTOMREQUEST  => $apiConfig->{'api_method'},
 			    CURLOPT_HTTPHEADER     => $apiParams['head'],
 			    CURLOPT_POSTFIELDS     => $apiParams['body'],
 		    ));

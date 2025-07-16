@@ -92,7 +92,7 @@ class ApiTable extends Table implements VersionableTableInterface, TaggableTable
 	public function store($updateNulls = false)
 	{
 
-		$this->{'api-params'} = json_encode($this->{'api-params'});
+		$this->{'api_params'} = json_encode($this->{'api_params'});
 
 		return parent::store($updateNulls);
 	}

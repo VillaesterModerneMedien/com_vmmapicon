@@ -44,6 +44,7 @@
 		<folder>layouts</folder>
 		<folder>src</folder>
 		<folder>tmpl</folder>
+		<folder>language</folder>
 	</files>
 
 	<languages folder="site/language">
@@ -73,6 +74,7 @@
             <folder>services</folder>
 			<folder>src</folder>
 			<folder>tmpl</folder>
+			<folder>language</folder>
 		</files>
 
 		<languages folder="administrator/language">
@@ -82,6 +84,4 @@
 			<language tag="en-GB">en-GB/com_vmmapicon.sys.ini</language>
 		</languages>
 	</administration>
-
-
 </extension>
