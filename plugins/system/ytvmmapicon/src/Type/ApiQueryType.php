@@ -23,21 +23,24 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
 use Joomla\Plugin\System\Ytvmmapicon\Helper\FieldsHelper;
 use Villaester\Component\Vmmapicon\Site\Helper\RouteHelper;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiType;
 
 
 class ApiQueryType
 {
     public static function config()
     {
+        // Use ApiType fields definitions to expose them as GraphQL input arguments
+        $fields = ApiType::configOld()['fields'];
+
         return [
-
             'fields' => [
-
                 'api' => [
-                    'type' => 'Api',
-                    'metadata' => [
+                    'type'       => 'Api',
+                    'args'       => $fields,
+                    'metadata'   => [
                         'label' => 'Api Response Single',
-                        'view' => ['com_vmmapicon.api'],
+                        'view'  => ['com_vmmapicon.api'],
                         'group' => 'Apis',
                     ],
                     'extensions' => [
@@ -45,18 +48,29 @@ class ApiQueryType
                     ],
                 ],
 
-            ]
+            ],
 
         ];
     }
 
     public static function api($root, $args)
     {
+        $app = Factory::getApplication();
+        // Initialize the API model and ignore default request state
+        $mvcFactory = $app->bootComponent('com_vmmapicon')->getMVCFactory();
+        /** @var \Villaester\Component\Vmmapicon\Site\Model\ApiModel $apiModel */
+        $apiModel = $mvcFactory->createModel('Api', 'Site', ['ignore_request' => true]);
 
-        $apiRemapped = FieldsHelper::setFieldMappings($root['item']);
+        // Apply GraphQL input arguments as filters to the API query
+        foreach ($args as $key => $value) {
+            if ($value !== null) {
+                $apiModel->setState('filter.' . $key, $value);
+            }
+        }
 
-        return $apiRemapped;
+        $item = $apiModel->getItem();
 
+        return FieldsHelper::setFieldMappings($item);
     }
 
 }

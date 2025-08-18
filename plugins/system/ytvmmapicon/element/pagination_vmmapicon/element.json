@@ -1,7 +1,7 @@
 {
     "@import": "./element.php",
-    "name": "pagination_immo",
-    "title": "Pagination Immo",
+    "name": "pagination_vmmapicon",
+    "title": "Pagination VMM APICon",
     "group": "api connector",
     "icon": "${url:images/icon.svg}",
     "iconSmall": "${url:images/iconSmall.svg}",

@@ -1,7 +1,7 @@
 {
     "@import": "./element.php",
-    "name": "form_immo",
-    "title": "Formular Immobilienanfrage",
+    "name": "form_vmmapicon",
+    "title": "Formular VMM APICon (vorbereitung)",
     "group": "api connector",
     "icon": "${url:images/icon.svg}",
     "iconSmall": "${url:images/iconSmall.svg}",
