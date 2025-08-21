@@ -33,14 +33,10 @@ class LoadSourceTypes
     {
         $query = [
             ApiQueryType::config(),
-            ApisQueryType::config(),
-
         ];
 
         $types = [
             ['Api', ApiType::config()],
-            ['Apis', ApisType::config()],
-            ['Apiimages', ApiimagesType::config()],
         ];
 
         foreach ($query as $args) {

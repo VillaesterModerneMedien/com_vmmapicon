@@ -55,10 +55,12 @@ use Joomla\Utilities\ArrayHelper;
 		    {
 			    switch ($param['position']) {
 				    case 'head':
-					    $params['head'][] = $param['key'] . ':' . $param['value'];
+					    // Header in Form "Key: Value"
+					    $params['head'][] = trim($param['key']) . ': ' . $param['value'];
 					    break;
 				    case 'url':
-					    $params['url'][] = $param['key'] . '=' . $param['value'];
+					    // Query-Parameter als Array sammeln, Encoding macht http_build_query
+					    $params['url'][$param['key']] = $param['value'];
 					    break;
 				    case 'body':
 					    $params['body'][$param['key']] = $param['value'];
@@ -67,11 +69,13 @@ use Joomla\Utilities\ArrayHelper;
 					    break;
 			    }
 		    }
-			if(isset($params['url']) && is_array($params['url']))
+			// Query-String korrekt bauen
+			if(!empty($params['url']) && is_array($params['url']))
 			{
-
-		    $urlString= implode('&', $params['url']);
-			$params['url'] = urlencode($urlString);
+			    $params['url'] = http_build_query($params['url']);
+			}
+			else {
+				$params['url'] = '';
 			}
 
 		    return $params;
@@ -89,13 +93,15 @@ use Joomla\Utilities\ArrayHelper;
 
 			if(!empty($apiConfig->{'api_url'})){
 			$url = $apiConfig->{'api_url'};
-			if($apiParams['url'] != '')
+			if(!empty($apiParams['url']))
 			{
 				$url .= '?' . $apiParams['url'];
 			}
 				$curl = curl_init();
 
-				curl_setopt_array($curl, array(
+				$method = $apiConfig->{'api_method'} ? strtoupper($apiConfig->{'api_method'}) : 'GET';
+
+				$opts = [
 					CURLOPT_URL            => $url,
 					CURLOPT_RETURNTRANSFER => true,
 					CURLOPT_ENCODING       => '',
@@ -103,10 +109,16 @@ use Joomla\Utilities\ArrayHelper;
 					CURLOPT_TIMEOUT        => 0,
 					CURLOPT_FOLLOWLOCATION => true,
 					CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-					CURLOPT_CUSTOMREQUEST  => $apiConfig->{'api_method'} ? $apiConfig->{'api_method'} : 'POST',
-					CURLOPT_HTTPHEADER     => $apiParams['head'] ? $apiParams['head'] : array(),
-					CURLOPT_POSTFIELDS     => $apiParams['body'] ? $apiParams['body'] : array(),
-				));
+					CURLOPT_CUSTOMREQUEST  => $method,
+					CURLOPT_HTTPHEADER     => $apiParams['head'] ?: [],
+				];
+
+				// Body nur setzen, wenn Methode nicht GET ist und Body-Daten vorhanden sind
+				if ($method !== 'GET' && !empty($apiParams['body'])) {
+					$opts[CURLOPT_POSTFIELDS] = $apiParams['body'];
+				}
+
+				curl_setopt_array($curl, $opts);
 
 				$response = curl_exec($curl);
 

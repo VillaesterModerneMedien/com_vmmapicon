@@ -44,22 +44,7 @@ class SourceListener
                         ],
                     ],
                 ],
-
-                'com_vmmapicon.apis' => [
-                    'label' => 'Api Results Blogview',
-                    'fieldset' => [
-                        'default' => [
-                            'fields' => [
-
-                            ],
-                        ],
-                    ],
-
-                ],
             ],
-
         ]);
-
-        //$metadata->set('script:customizer.api', ['src' => Url::to('plugins/system/ytvmmapicon/api.js'), 'defer' => true]);
     }
 }

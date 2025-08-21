@@ -290,7 +290,7 @@ class ApiModel extends AdminModel
 		$db->setQuery($query);
 		$apis = $db->loadObjectList();
 
-
+		$options = [];
 		foreach ($apis as $api) {
 			$options[] = [
 				'value' => $api->id,
@@ -318,6 +318,26 @@ class ApiModel extends AdminModel
 			return [];
 		}
 
-		return $mappingData;
+		// Mapping kommt als { json_mapping0: {...}, json_mapping1: {...} }
+		$flat = array_values($mappingData);
+
+		// Typen normalisieren
+		foreach ($flat as &$entry) {
+			$type = $entry['field_type'] ?? 'String';
+			if (in_array($type, ['Object','Array'], true)) {
+				$entry['field_type'] = 'listOf(String)';
+				continue;
+			}
+			if (!isset($entry['field_type']) || !is_string($entry['field_type'])) {
+				$entry['field_type'] = 'String';
+			}
+			$valid = ['String','Int','Float','Boolean','listOf(String)'];
+			if (!in_array($entry['field_type'], $valid, true)) {
+				$entry['field_type'] = 'String';
+			}
+		}
+		unset($entry);
+
+		return $flat;
 	}
 }

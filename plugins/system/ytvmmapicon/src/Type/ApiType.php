@@ -28,25 +28,29 @@ class ApiType
 {
 	public static function config()
 	{
-		$selectedApi = ApiQueryType::getApiOptions();
-		$apiId = $selectedApi[0]['value'];
-		$model  = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-		$mapping = $model->getMapping($apiId);
-		$data = '';
-		$fields = [];
-		error_log("Terrorlog ");
-		file_put_contents('/tmp/debug.log', "Resolve called: " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+		// Standardmäßig erstes veröffentlichtes API verwenden; bei Schema-Refresh nach ID-Änderung wird neu aufgebaut
+		$apiOptions = ApiQueryType::getApiOptions();
+		$apiId = $apiOptions[0]['value'] ?? null;
 
-		foreach ($mapping as $key => $field) {
-			$fields[$field['yootheme_name']] = [
-				'type' => $field['field_type'],
-				'metadata' => [
-					'label' => $field['field_label'],
-				],
-				'extensions' => [
-					'call' => __CLASS__ . '::resolve',
-				],
-			];
+		$fields = [];
+
+		if ($apiId !== null) {
+			// Mapping nur aus der Komponente laden (kein APICall im Schemaaufbau)
+			$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
+			$mapping = $model->getMapping($apiId) ?? [];
+
+			foreach ($mapping as $field) {
+				$typeDecl = self::toGraphQLTypeDecl($field['field_type'] ?? 'String');
+				$fields[$field['yootheme_name']] = [
+					'type' => $typeDecl,
+					'metadata' => [
+						'label' => $field['field_label'] ?? $field['yootheme_name'],
+					],
+					'extensions' => [
+						'call' => __CLASS__ . '::resolve',
+					],
+				];
+			}
 		}
 
 		return [
@@ -65,10 +69,37 @@ class ApiType
 		if (isset($item->api_data) && isset($item->mapping_fields)) {
 			$fieldName = $info->fieldName;
 
-			// Entsprechendes Mapping für das aktuelle Feld finden
 			foreach ($item->mapping_fields as $mappingItem) {
-				if ($mappingItem['yootheme_name'] === $fieldName) {
-					return self::extractValueFromPath($item->api_data, $mappingItem['json_path']);
+				if (($mappingItem['yootheme_name'] ?? null) === $fieldName) {
+					$value = self::extractValueFromPath($item->api_data, $mappingItem['json_path'] ?? '');
+					$type  = $mappingItem['field_type'] ?? 'String';
+
+					// listOf(String): immer ein Array von Strings zurückgeben
+					if (self::isListOf($type)) {
+						if ($value === null) {
+							return [];
+						}
+						if (!is_array($value)) {
+							// Objekt oder Skalar in ein 1-Element-Array serialisieren
+							if (is_object($value) || is_array($value)) {
+								return [json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)];
+							}
+							return [(string) $value];
+						}
+						// Array-Elemente in Strings umwandeln
+						return array_map(function($v){
+							if (is_scalar($v) || $v === null) {
+								return $v === null ? '' : (string) $v;
+							}
+							return json_encode($v, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+						}, $value);
+					}
+
+					// Skalar: nie ein Array/Objekt zurückgeben
+					if (is_array($value) || is_object($value)) {
+						return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+					}
+					return $value;
 				}
 			}
 		}
@@ -78,19 +109,66 @@ class ApiType
 
 	private static function extractValueFromPath($data, $path)
 	{
-		$pathSegments = explode('->', $path);
+		$pathSegments = $path !== '' ? explode('->', $path) : [];
 		$current = $data;
 
-		foreach ($pathSegments as $segment) {
-			if (is_array($current) && isset($current[$segment])) {
-				$current = $current[$segment];
-			} elseif (is_object($current) && isset($current->$segment)) {
-				$current = $current->$segment;
-			} else {
+		for ($i = 0, $n = count($pathSegments); $i < $n; $i++) {
+			$segment = $pathSegments[$i];
+
+			if (is_array($current)) {
+				if (array_key_exists($segment, $current)) {
+					$current = $current[$segment];
+					continue;
+				}
+				// Wenn es eine Liste ist und der nächste Schlüssel nicht numerisch ist, nimm Index 0 implizit
+				$keys = array_keys($current);
+				$sequential = $keys === range(0, count($current) - 1);
+				if ($sequential && isset($current[0])) {
+					// Falls der aktuelle Segmentname eigentlich ein Index ist, nutze ihn
+					if (ctype_digit((string) $segment) && isset($current[(int) $segment])) {
+						$current = $current[(int) $segment];
+						continue;
+					}
+					// Andernfalls implizit erstes Element und denselben Segmentnamen erneut versuchen
+					$current = $current[0];
+					$i--; // denselben Segmentnamen erneut prüfen
+					continue;
+				}
+				return null;
+			}
+			elseif (is_object($current)) {
+				if (isset($current->$segment)) {
+					$current = $current->$segment;
+					continue;
+				}
+				return null;
+			}
+			else {
 				return null;
 			}
 		}
 
 		return $current;
+	}
+
+	private static function toGraphQLTypeDecl(string $type)
+	{
+		$scalar = ['String','Int','Float','Boolean'];
+		if (in_array($type, $scalar, true)) {
+			return $type;
+		}
+		if (self::isListOf($type)) {
+			$inner = trim(substr($type, strlen('listOf('), -1)) ?: 'String';
+			if (!in_array($inner, $scalar, true)) {
+				$inner = 'String';
+			}
+			return ['listOf' => $inner];
+		}
+		return 'String';
+	}
+
+	private static function isListOf(string $type): bool
+	{
+		return str_starts_with($type, 'listOf(') && str_ends_with($type, ')');
 	}
 }

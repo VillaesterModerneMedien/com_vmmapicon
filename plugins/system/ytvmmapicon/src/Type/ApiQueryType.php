@@ -54,6 +54,9 @@ class ApiQueryType
 		                        'description' => 'Api auswählen',
 		                        'type' => 'select',
 		                        'options' => $apiOptions,
+		                        // Hinweis für UI: Nach Änderung neu laden, damit Felder aktualisiert werden (Option B)
+		                        'reload' => true,
+		                        'refresh' => true,
 	                        ],
                         ],
                     ],
@@ -74,9 +77,17 @@ class ApiQueryType
 
 	public static function resolve($item, $args, $context, $info)
 	{
+		// Fallback, wenn keine ID gesetzt ist
+		$apiId = isset($args['id']) && $args['id'] !== '' ? $args['id'] : null;
+		if ($apiId === null) {
+			$options = self::getApiOptions();
+			$apiId = $options[0]['value'] ?? null;
+			if ($apiId === null) {
+				return null;
+			}
+		}
 
-
-		return ApiTypeProvider::get($args['id']);
+		return ApiTypeProvider::get($apiId);
 	}
 
 }

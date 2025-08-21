@@ -49,18 +49,5 @@ class TemplateListener
                 'params' => ['item' => $view->get('item')],
             ];
         }
-
-        // match context and layout from view object
-        if ($context === 'com_vmmapicon.apis' && $layout === 'default' && !$tpl) {
-$a = 'bla';
-            // return type, query and parameters of the matching view
-            return [
-                'type' => $context,
-                'params' => [
-                    'items' => $view->get('items'),
-                    'pagination' => $view->get('pagination'),
-                ],
-            ];
-        }
     }
 }
