@@ -21,56 +21,62 @@ namespace Joomla\Plugin\System\Ytvmmapicon\Type;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Router\Route;
+use Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider;
 use Joomla\Plugin\System\Ytvmmapicon\Helper\FieldsHelper;
 use Villaester\Component\Vmmapicon\Site\Helper\RouteHelper;
-use Joomla\Plugin\System\Ytvmmapicon\Type\ApiType;
 
 
 class ApiQueryType
 {
     public static function config()
     {
-        // Use ApiType fields definitions to expose them as GraphQL input arguments
-        $fields = ApiType::configOld()['fields'];
+		$apiOptions = self::getApiOptions();
 
         return [
+
             'fields' => [
+
                 'api' => [
-                    'type'       => 'Api',
-                    'args'       => $fields,
-                    'metadata'   => [
+                    'type' => 'Api',
+                    'args' => [
+	                    'id' => [
+		                    'type' => 'String',
+	                    ],
+                    ],
+                    'metadata' => [
                         'label' => 'Api Response Single',
-                        'view'  => ['com_vmmapicon.api'],
+                        'view' => ['com_vmmapicon.api'],
                         'group' => 'Apis',
+
+                        'fields' => [
+	                        'id' => [
+		                        'label' => 'Api-ID',
+		                        'description' => 'Api auswählen',
+		                        'type' => 'select',
+		                        'options' => $apiOptions,
+	                        ],
+                        ],
                     ],
                     'extensions' => [
-                        'call' => __CLASS__ . '::api',
+	                    'call' => __CLASS__ . '::resolve',
                     ],
                 ],
-
-            ],
-
+            ]
         ];
     }
+	public static function getApiOptions()
+	{
+		$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
+		$options = $model->getApis();
 
-    public static function api($root, $args)
-    {
-        $app = Factory::getApplication();
-        // Initialize the API model and ignore default request state
-        $mvcFactory = $app->bootComponent('com_vmmapicon')->getMVCFactory();
-        /** @var \Villaester\Component\Vmmapicon\Site\Model\ApiModel $apiModel */
-        $apiModel = $mvcFactory->createModel('Api', 'Site', ['ignore_request' => true]);
+		return $options;
+	}
 
-        // Apply GraphQL input arguments as filters to the API query
-        foreach ($args as $key => $value) {
-            if ($value !== null) {
-                $apiModel->setState('filter.' . $key, $value);
-            }
-        }
+	public static function resolve($item, $args, $context, $info)
+	{
 
-        $item = $apiModel->getItem();
 
-        return FieldsHelper::setFieldMappings($item);
-    }
+		return ApiTypeProvider::get($args['id']);
+	}
 
 }

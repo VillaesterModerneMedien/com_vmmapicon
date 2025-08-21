@@ -46,8 +46,6 @@ class plgSystemYtvmmapicon extends CMSPlugin
 	        return;
 	    }
 
-	    $b = Factory::getApplication();
-
 	    // Load a single module from the same directory
 	    $app = Application::getInstance();
 	    $app->load(__DIR__ . '/bootstrap.php');

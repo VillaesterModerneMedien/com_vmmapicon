@@ -38,7 +38,7 @@ class LoadSourceTypes
         ];
 
         $types = [
-            ['Api', ApiType::configOld()],
+            ['Api', ApiType::config()],
             ['Apis', ApisType::config()],
             ['Apiimages', ApiimagesType::config()],
         ];

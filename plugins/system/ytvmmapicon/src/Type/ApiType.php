@@ -1,109 +1,96 @@
 <?php
-/**
- *
- *
- * \ \    / /  \/  |  \/  |
- *  \ \  / /| \  / | \  / |
- *   \ \/ / | |\/| | |\/| |
- *    \  /  | |  | | |  | |
- *     \/   |_|  |_|_|  |_| Villaester Moderne Medien GmbH * * @package Joomla.Component
+/**  
+ * 
+ * 
+ * \ \    / /  \/  |  \/  | 
+ *  \ \  / /| \  / | \  / | 
+ *   \ \/ / | |\/| | |\/| | 
+ *    \  /  | |  | | |  | | 
+ *     \/   |_|  |_|_|  |_| Villaester Moderne Medien GmbH * * @package Joomla.Component  
  * @subpackage  com_vmmapicon
- * @copyright   Copyright (C) 2025 Villaester Moderne Medien
- * @author      Mario Hewera & Kiki Schuelling
- * @license     GNU General Public License version 2 or later
- * @author      VMM Development Team
- * @link        https://villaester.de
- * @version     1.0.0
+ * @copyright   Copyright (C) 2025 Villaester Moderne Medien  
+ * @author      Mario Hewera & Kiki Schuelling  
+ * @license     GNU General Public License version 2 or later  
+ * @author      VMM Development Team  
+ * @link        https://villaester.de  
+ * @version     1.0.0  
  */
 
 //
 namespace Joomla\Plugin\System\Ytvmmapicon\Type;
 
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-
-use Joomla\CMS\Router\Route;
-use Joomla\Component\Categories\Administrator\Model\CategoryModel;
-use Joomla\Component\Fields\Administrator\Model\FieldModel;
-use \Joomla\Language\Text;
-use Joomla\Plugin\System\Ytvmmapicon\Helper\FieldsHelper;
-use Joomla\String\StringHelper;
-use VmmdatabaseNamespace\Component\Vmmdatabase\Site\Model\DatasetModel;
+use Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
 
 
 class ApiType
 {
+	public static function config()
+	{
+		$selectedApi = ApiQueryType::getApiOptions();
+		$apiId = $selectedApi[0]['value'];
+		$model  = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
+		$mapping = $model->getMapping($apiId);
+		$data = '';
+		$fields = [];
+		error_log("Terrorlog ");
+		file_put_contents('/tmp/debug.log', "Resolve called: " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
 
-    public function setFields($fieldname, $fieldtype, $label, $tab)
-    {
-        $array = [
-            $fieldname => [
-                'type' => $fieldtype,
-                'metadata' => [
-                    'label' => $label,
-                    'group' => $tab
-                ],
-                'extensions' => [
-                    'call' => [
-                        'func' => __CLASS__ . '::resolve',
-                        'args' => [
-                            'fieldname' => $fieldname,
-                        ]
-                    ]
+		foreach ($mapping as $key => $field) {
+			$fields[$field['yootheme_name']] = [
+				'type' => $field['field_type'],
+				'metadata' => [
+					'label' => $field['field_label'],
+				],
+				'extensions' => [
+					'call' => __CLASS__ . '::resolve',
+				],
+			];
+		}
 
-                ]
+		return [
+			'fields' => $fields,
 
-            ],
-        ];
+			'metadata' => [
+				'type' => true,
+				'label' => 'Api Response',
+			],
+		];
+	}
 
-        return $array;
-    }
+	public static function resolve($item, $args, $context, $info)
+	{
 
+		if (isset($item->api_data) && isset($item->mapping_fields)) {
+			$fieldName = $info->fieldName;
 
-    public static function configOld2()
-    {
+			// Entsprechendes Mapping für das aktuelle Feld finden
+			foreach ($item->mapping_fields as $mappingItem) {
+				if ($mappingItem['yootheme_name'] === $fieldName) {
+					return self::extractValueFromPath($item->api_data, $mappingItem['json_path']);
+				}
+			}
+		}
 
-        $test = 'not set';
+		return null;
+	}
 
-        $db    = Factory::getContainer()->get('DatabaseDriver');
+	private static function extractValueFromPath($data, $path)
+	{
+		$pathSegments = explode('->', $path);
+		$current = $data;
 
-        $app       = Factory::getApplication();
+		foreach ($pathSegments as $segment) {
+			if (is_array($current) && isset($current[$segment])) {
+				$current = $current[$segment];
+			} elseif (is_object($current) && isset($current->$segment)) {
+				$current = $current->$segment;
+			} else {
+				return null;
+			}
+		}
 
-        $session = $app->getSession();
-        $datasetId = $session->get('com_vmmapicon.edit.dataset.data.id');
-
-        // Get the FieldsModelField, we need it in a sec
-        $mvcFactory = $app->bootComponent('com_vmmapicon')->getMVCFactory();
-
-        /** @var DatasetModel $datasetModel */
-        $datasetModel = $mvcFactory->createModel('Dataset', 'Site', ['ignore_request' => true]);
-
-        $currentCategory = 0;
-
-        if(is_object($datasetModel->getItem($datasetId)))
-        {
-            $currentCategory = $datasetModel->getItem($datasetId)->catid;
-        }
-
-
-
-        return [
-            'fields' => [
-
-            ],
-            'metadata' => [
-                'type' => true,
-                'label' => 'Api',
-                'value' => '', // Falls benötigt
-            ]
-        ];
-    }
-
-    public static function images($data)
-    {
-        $attachments = $data['attachments'];
-        $attachments = json_decode($attachments, true);
-
-        return $attachments;
-    }
+		return $current;
+	}
 }

@@ -37,7 +37,7 @@ class ApisQueryType
                         'listOf' => 'Apis',
                     ],
                     'metadata' => [
-                        'label' => 'Api Response',
+                        'label' => 'Api lists',
                         'view' => ['com_vmmapicon.apis'],
                         'group' => 'Api Connections',
                     ],

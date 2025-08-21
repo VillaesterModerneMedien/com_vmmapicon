@@ -1,24 +1,12 @@
 <?php
 
 /**
+ * @package     Joomla.Site
+ * @subpackage  Layout
  *
- *
- * \ \    / /  \/  |  \/  |
- *  \ \  / /| \  / | \  / |
- *   \ \/ / | |\/| | |\/| |
- *    \  /  | |  | | |  | |
- *     \/   |_|  |_|_|  |_| Villaester Moderne Medien GmbH
- *
- * @package     Joomla.Component
- * @subpackage  com_vmmapicon
- * @copyright   Copyright (C) 2025 Villaester Moderne Medien
- * @author      Mario Hewera & Kiki Schuelling
- * @license     GNU General Public License version 2 or later
- * @author      VMM Development Team
- * @link        https://villaester.de
- * @version     1.0.0
+ * @copyright   (C) 2014 Open Source Matters, Inc. <https://www.joomla.org>
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
-
 
 defined('_JEXEC') or die;
 
