@@ -12,6 +12,17 @@
       "attributes": {
         "defer": true
       }
+    },
+    {
+      "name": "com_vmmapicon.admin-vmmapicon-modal",
+      "type": "script",
+      "uri": "com_vmmapicon/admin-vmmapicon-modal.js",
+      "dependencies": [
+        "core"
+      ],
+      "attributes": {
+        "defer": true
+      }
     }
   ]
 }

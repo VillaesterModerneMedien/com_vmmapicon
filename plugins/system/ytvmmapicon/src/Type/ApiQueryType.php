@@ -77,17 +77,10 @@ class ApiQueryType
 
 	public static function resolve($item, $args, $context, $info)
 	{
-		// Fallback, wenn keine ID gesetzt ist
-		$apiId = isset($args['id']) && $args['id'] !== '' ? $args['id'] : null;
-		if ($apiId === null) {
-			$options = self::getApiOptions();
-			$apiId = $options[0]['value'] ?? null;
-			if ($apiId === null) {
-				return null;
-			}
-		}
 
-		return ApiTypeProvider::get($apiId);
+
+		return ApiTypeProvider::get($args['id']);
 	}
 
 }
+
