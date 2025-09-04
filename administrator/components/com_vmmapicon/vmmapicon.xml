@@ -6,7 +6,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>mh@villaester.de</authorEmail>
 	<authorUrl>https://villaester.de</authorUrl>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<description>COM_VMMAPICON_XML_DESCRIPTION</description>
     <namespace path="src">Villaester\Component\Vmmapicon</namespace>
 
@@ -44,12 +44,10 @@
 		<folder>layouts</folder>
 		<folder>src</folder>
 		<folder>tmpl</folder>
+		<folder>language</folder>
 	</files>
 
-	<languages folder="site/language">
-		<language tag="de-DE">de-DE/com_vmmapicon.ini</language>
-		<language tag="en-GB">en-GB/com_vmmapicon.ini</language>
-	</languages>
+
 
 	<administration>
 		<menu img="class:comment">
@@ -73,14 +71,10 @@
             <folder>services</folder>
 			<folder>src</folder>
 			<folder>tmpl</folder>
+			<folder>layouts</folder>
+			<folder>language</folder>
 		</files>
 
-		<languages folder="administrator/language">
-			<language tag="de-DE">de-DE/com_vmmapicon.ini</language>
-			<language tag="de-DE">de-DE/com_vmmapicon.sys.ini</language>
-			<language tag="en-GB">en-GB/com_vmmapicon.ini</language>
-			<language tag="en-GB">en-GB/com_vmmapicon.sys.ini</language>
-		</languages>
 	</administration>
 
 

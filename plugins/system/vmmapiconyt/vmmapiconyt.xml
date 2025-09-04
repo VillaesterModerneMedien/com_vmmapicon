@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="4.0" type="plugin" group="system" method="upgrade">
+    <name>PLG_SYSTEM_VMMAPICONYT</name>
+    <author>Villaester Moderne Medien</author>
+    <creationDate>January 2025</creationDate>
+    <copyright>Copyright (C) 2025 Villaester Moderne Medien</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <authorEmail>info@villaester.de</authorEmail>
+    <authorUrl>https://villaester.de</authorUrl>
+    <version>1.0.0</version>
+    <description>PLG_SYSTEM_VMMAPICON_YOOTHEME_XML_DESCRIPTION</description>
+    <namespace path="src">Villaester\Plugin\System\Vmmapiconyt</namespace>
+
+    <files>
+        <filename plugin="vmmapiconyt">vmmapiconyt.php</filename>
+        <filename>bootstrap.php</filename>
+        <folder>src</folder>
+        <folder>language</folder>
+    </files>
+
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field
+                    name="enable_cache"
+                    type="radio"
+                    label="PLG_SYSTEM_VMMAPICON_YOOTHEME_CACHE_LABEL"
+                    description="PLG_SYSTEM_VMMAPICON_YOOTHEME_CACHE_DESC"
+                    class="btn-group btn-group-yesno"
+                    default="1">
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field
+                    name="cache_time"
+                    type="number"
+                    label="PLG_SYSTEM_VMMAPICON_YOOTHEME_CACHE_TIME_LABEL"
+                    description="PLG_SYSTEM_VMMAPICON_YOOTHEME_CACHE_TIME_DESC"
+                    default="900"
+                    min="60"
+                    max="86400"
+                    step="60"
+                    showon="enable_cache:1"
+                />
+            </fieldset>
+        </fields>
+    </config>
+</extension>

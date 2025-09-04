@@ -1,104 +1,205 @@
 <?php
-
 /**
- * Joomla! Content Management System
+ * @package     Joomla.Site
+ * @subpackage  com_vmmapicon
  *
- * @copyright  (C) 2010 Open Source Matters, Inc. <https://www.joomla.org>
- * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright   Copyright (C) 2025 Villaester Moderne Medien GmbH
+ * @license     GNU General Public License version 2 or later
+ * @author      VMM Development Team
+ * @link        https://villaester.de
+ * @version     1.0.0
  */
 
 namespace Villaester\Component\Vmmapicon\Site\Model;
 
-use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Event\Model;
+\defined('_JEXEC') or die;
+
 use Joomla\CMS\Factory;
-use Joomla\CMS\Form\FormFactoryInterface;
-use Joomla\CMS\Language\Associations;
-use Joomla\CMS\Language\LanguageHelper;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Log\Log;
-use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
+use Joomla\CMS\MVC\Model\ItemModel;
 use Joomla\CMS\Object\CMSObject;
-use Joomla\CMS\Plugin\PluginHelper;
-use Joomla\CMS\Router\Route;
-use Joomla\CMS\Table\Table;
-use Joomla\CMS\Table\TableInterface;
-use Joomla\CMS\Tag\TaggableTableInterface;
-use Joomla\CMS\UCM\UCMType;
-use Joomla\Database\ParameterType;
+use Joomla\CMS\Language\Text;
 use Joomla\Registry\Registry;
-use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// phpcs:disable PSR1.Files.SideEffects
-\defined('_JEXEC') or die;
-// phpcs:enable PSR1.Files.SideEffects
-
 /**
- * Prototype admin model.
+ * Api Model
  *
- * @since  1.6
+ * @since  1.0.0
  */
-class ApiModel extends AdminModel
+class ApiModel extends ItemModel
 {
+    /**
+     * Model context string.
+     *
+     * @var    string
+     * @since  1.0.0
+     */
+    protected $_context = 'com_vmmapicon.api';
 
     /**
-     * Constructor.
+     * Method to auto-populate the model state.
      *
-     * @param   array                  $config       An array of configuration options (name, state, dbo, table_path, ignore_request).
-     * @param   ?MVCFactoryInterface   $factory      The factory.
-     * @param   ?FormFactoryInterface  $formFactory  The form factory.
+     * Note. Calling getState in this method will result in recursion.
      *
-     * @since   1.6
-     * @throws  \Exception
+     * @return  void
+     *
+     * @since   1.0.0
      */
-    public function __construct($config = [], MVCFactoryInterface $factory = null, FormFactoryInterface $formFactory = null)
+    protected function populateState()
     {
-        parent::__construct($config, $factory, $formFactory);
+        $app = Factory::getApplication();
+
+        // Load state from the request.
+        $pk = $app->input->getInt('id');
+        $this->setState('api.id', $pk);
+
+        $offset = $app->input->getUint('limitstart');
+        $this->setState('list.offset', $offset);
+
+        // Load the parameters.
+        $params = $app->getParams();
+        $this->setState('params', $params);
     }
 
-
     /**
-     * Method to get a single record.
+     * Method to get api data.
      *
-     * @param   integer  $pk  The id of the primary key.
+     * @param   integer  $pk  The id of the api.
      *
-     * @return  \stdClass|false  Object on success, false on failure.
+     * @return  object|boolean  Menu item data object on success, false on failure.
      *
-     * @since   1.6
+     * @since   1.0.0
      */
     public function getItem($pk = null)
     {
-        $pk    = (!empty($pk)) ? $pk : (int) $this->getState($this->getName() . '.id');
-        $table = $this->getTable();
+        $pk = (!empty($pk)) ? $pk : (int) $this->getState('api.id');
 
-        if ($pk > 0) {
-            // Attempt to load the row.
-            $return = $table->load($pk);
+        if ($this->_item === null) {
+            $this->_item = [];
+        }
 
-            // Check for a table object error.
-            if ($return === false) {
-                // If there was no underlying error, then the false means there simply was not a row in the db for this $pk.
-                if (!$table->getError()) {
-                    $this->setError(Text::_('JLIB_APPLICATION_ERROR_NOT_EXIST'));
-                } else {
-                    $this->setError($table->getError());
+        if (!isset($this->_item[$pk])) {
+            try {
+                $db = $this->getDbo();
+                $query = $db->getQuery(true)
+                    ->select(
+                        $this->getState(
+                            'item.select',
+                            'a.id, a.title, a.alias, a.api_url, a.api_method, a.api_params, a.api_mapping, ' .
+                            'a.published, a.created, a.created_by, a.modified, a.modified_by, a.access, ' .
+                            'a.params, a.metakey, a.metadesc, a.metadata'
+                        )
+                    )
+                    ->from('#__vmmapicon_apis AS a')
+                    ->where('a.id = :id')
+                    ->where('a.published = 1')
+                    ->bind(':id', $pk, \Joomla\Database\ParameterType::INTEGER);
+
+                $db->setQuery($query);
+
+                $data = $db->loadObject();
+
+                if (empty($data)) {
+                    throw new \Exception(Text::_('COM_VMMAPICON_ERROR_API_NOT_FOUND'), 404);
                 }
 
-                return false;
+                // Convert parameter fields to objects.
+                $registry = new Registry($data->params);
+                $data->params = $registry->toArray();
+
+                // Convert metadata field to object.
+                $registry = new Registry($data->metadata);
+                $data->metadata = $registry->toArray();
+
+                $this->_item[$pk] = $data;
+            } catch (\Exception $e) {
+                if ($e->getCode() == 404) {
+                    throw new \Exception(Text::_('COM_VMMAPICON_ERROR_API_NOT_FOUND'), 404);
+                } else {
+                    $this->setError($e);
+                    $this->_item[$pk] = false;
+                }
             }
         }
 
-        // Convert to the CMSObject before adding other data.
-        $properties = $table->getProperties(1);
-        $item       = ArrayHelper::toObject($properties, CMSObject::class);
-
-        if (property_exists($item, 'params')) {
-            $registry     = new Registry($item->params);
-            $item->params = $registry->toArray();
-        }
-
-        return $item;
+        return $this->_item[$pk];
     }
 
+    /**
+     * Method to get a list of APIs for selection
+     *
+     * @return  array  List of APIs
+     *
+     * @since   1.0.0
+     */
+    public function getApis()
+    {
+        $db = Factory::getDbo();
+        $query = $db->getQuery(true)
+            ->select(['id', 'title'])
+            ->from('#__vmmapicon_apis')
+            ->where('published = 1')
+            ->order('title ASC');
+
+        $db->setQuery($query);
+        $apis = $db->loadObjectList();
+
+        $options = [];
+        foreach ($apis as $api) {
+            $options[] = [
+                'value' => $api->id,
+                'text' => $api->id . ' - ' . $api->title
+            ];
+        }
+        return $options;
+    }
+
+    /**
+     * Method to get the mapping for an API
+     *
+     * @param   int  $apiId  The API ID
+     *
+     * @return  array  Mapping data
+     *
+     * @since   1.0.0
+     */
+    public function getMapping($apiId = null)
+    {
+        if (!$apiId) {
+            $apiId = $this->getState('api.id');
+        }
+
+        $item = $this->getItem($apiId);
+
+        if (!$item || empty($item->api_mapping)) {
+            return [];
+        }
+
+        $mappingData = json_decode($item->api_mapping, true);
+        if (!$mappingData) {
+            return [];
+        }
+
+        // Mapping comes as { json_mapping0: {...}, json_mapping1: {...} }
+        $flat = array_values($mappingData);
+
+        // Normalize types
+        foreach ($flat as &$entry) {
+            $type = $entry['field_type'] ?? 'String';
+            if (in_array($type, ['Object','Array'], true)) {
+                $entry['field_type'] = 'listOf(String)';
+                continue;
+            }
+            if (!isset($entry['field_type']) || !is_string($entry['field_type'])) {
+                $entry['field_type'] = 'String';
+            }
+            $valid = ['String','Int','Float','Boolean','listOf(String)'];
+            if (!in_array($entry['field_type'], $valid, true)) {
+                $entry['field_type'] = 'String';
+            }
+        }
+        unset($entry);
+
+        return $flat;
+    }
 }

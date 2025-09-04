@@ -10,7 +10,7 @@
  * @version     1.0.0
  */
 
-namespace Villaester\Component\Vmmapicon\Site\View\Apis;
+namespace Villaester\Component\Vmmapicon\Site\View\Api;
 
 \defined('_JEXEC') or die;
 
@@ -19,32 +19,19 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
 /**
- * HTML View class for the Apis component
+ * HTML View class for the Api component
  *
  * @since  1.0.0
  */
 class HtmlView extends BaseHtmlView
 {
     /**
-     * An array of items
+     * The api item
      *
-     * @var  array
+     * @var    object
+     * @since  1.0.0
      */
-    protected $items;
-
-    /**
-     * The pagination object
-     *
-     * @var  \Joomla\CMS\Pagination\Pagination
-     */
-    protected $pagination;
-
-    /**
-     * The model state
-     *
-     * @var  object
-     */
-    protected $state;
+    protected $item;
 
     /**
      * The page parameters
@@ -53,6 +40,22 @@ class HtmlView extends BaseHtmlView
      * @since  1.0.0
      */
     protected $params;
+
+    /**
+     * The model state
+     *
+     * @var    object
+     * @since  1.0.0
+     */
+    protected $state;
+
+    /**
+     * The page class suffix
+     *
+     * @var    string
+     * @since  1.0.0
+     */
+    protected $pageclass_sfx = '';
 
     /**
      * Display the view
@@ -67,14 +70,23 @@ class HtmlView extends BaseHtmlView
     {
         $app = Factory::getApplication();
 
-        $this->items      = $this->get('Items');
-        $this->pagination = $this->get('Pagination');
-        $this->state      = $this->get('State');
-        $this->params     = $this->state->get('params');
+        $this->item   = $this->get('Item');
+        $this->state  = $this->get('State');
+        $this->params = $this->state->get('params');
 
         // Check for errors.
         if (count($errors = $this->get('Errors'))) {
             throw new \Exception(implode("\n", $errors), 500);
+        }
+
+        // Check if the API exists
+        if (empty($this->item)) {
+            throw new \Exception(Text::_('COM_VMMAPICON_ERROR_API_NOT_FOUND'), 404);
+        }
+
+        // Check if the API is published
+        if ($this->item->published != 1) {
+            throw new \Exception(Text::_('COM_VMMAPICON_ERROR_API_NOT_PUBLISHED'), 403);
         }
 
         $this->prepareDocument();
@@ -101,7 +113,7 @@ class HtmlView extends BaseHtmlView
         if ($menu) {
             $this->params->def('page_heading', $this->params->get('page_title', $menu->title));
         } else {
-            $this->params->def('page_heading', Text::_('COM_VMMAPICON_APIS'));
+            $this->params->def('page_heading', Text::_('COM_VMMAPICON_API'));
         }
 
         $title = $this->params->get('page_title', '');
@@ -126,6 +138,11 @@ class HtmlView extends BaseHtmlView
 
         if ($this->params->get('robots')) {
             $this->document->setMetadata('robots', $this->params->get('robots'));
+        }
+
+        // Add breadcrumb
+        if (!$menu) {
+            $pathway->addItem($this->item->title);
         }
     }
 }
