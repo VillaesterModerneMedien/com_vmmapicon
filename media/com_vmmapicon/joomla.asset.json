@@ -6,9 +6,9 @@
   "license": "GPL-2.0-or-later",
   "assets": [
     {
-      "name": "com_vmmapicon.jsonselector",
+      "name": "com_vmmapicon.apimapping",
       "type": "script",
-      "uri": "com_vmmapicon/jsonField.js",
+      "uri": "com_vmmapicon/js/apiMapping.js",
       "attributes": {
         "defer": true
       }

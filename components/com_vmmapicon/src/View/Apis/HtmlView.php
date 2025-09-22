@@ -1,26 +1,25 @@
 <?php
 /**
- * @package     Joomla.Administrator
- * @subpackage  com_dnbooking
+ * @package     Joomla.Site
+ * @subpackage  com_vmmapicon
  *
- * @copyright   Copyright (C) 2024 Mario Hewera. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright   Copyright (C) 2025 Villaester Moderne Medien GmbH
+ * @license     GNU General Public License version 2 or later
+ * @author      VMM Development Team
+ * @link        https://villaester.de
+ * @version     1.0.0
  */
-namespace Villaester\Component\Vmmapicon\Administrator\View\Apis;
+
+namespace Villaester\Component\Vmmapicon\Site\View\Apis;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\Helper\ContentHelper;
-use Joomla\CMS\Language\Multilanguage;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Toolbar\Toolbar;
-use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 
 /**
- *  * View class for a list of customers.
+ * HTML View class for the Apis component
  *
  * @since  1.0.0
  */
@@ -43,37 +42,22 @@ class HtmlView extends BaseHtmlView
     /**
      * The model state
      *
-     * @var  \Joomla\CMS\Object\CMSObject
+     * @var  object
      */
     protected $state;
 
     /**
-     * Form object for search filters
+     * The page parameters
      *
-     * @var  \Joomla\CMS\Form\Form
+     * @var    \Joomla\Registry\Registry|null
+     * @since  1.0.0
      */
-    public $filterForm;
+    protected $params;
 
     /**
-     * The active search filters
+     * Display the view
      *
-     * @var  array
-     */
-    public $activeFilters;
-
-    /**
-     * Is this view an Empty State
-     *
-     * @var   boolean
-     *
-     * @since 1.0.0
-     */
-    private $isEmptyState = false;
-
-    /**
-     * Method to display the view.
-     *
-     * @param   string  $tpl  A template file to load. [optional]
+     * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
      *
      * @return  void
      *
@@ -81,85 +65,67 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null): void
     {
-        $this->items         = $this->get('Items');
-        $this->pagination    = $this->get('Pagination');
-        $this->state         = $this->get('State');
-        $this->filterForm    = $this->get('FilterForm');
-        $this->activeFilters = $this->get('ActiveFilters');
+        $app = Factory::getApplication();
 
-        if (empty($this->items) && $this->isEmptyState = $this->get('IsEmptyState'))
-        {
-            $this->setLayout('emptystate');
+        $this->items      = $this->get('Items');
+        $this->pagination = $this->get('Pagination');
+        $this->state      = $this->get('State');
+        $this->params     = $this->state->get('params');
+
+        // Check for errors.
+        if (count($errors = $this->get('Errors'))) {
+            throw new \Exception(implode("\n", $errors), 500);
         }
 
-        // We don't need toolbar in the modal window.
-        if ($this->getLayout() !== 'modal')
-        {
-            $this->addToolbar();
-        }
+        $this->prepareDocument();
 
         parent::display($tpl);
     }
 
     /**
-     * Add the page title and toolbar.
+     * Prepares the document
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0.0
      */
-    protected function addToolbar()
+    protected function prepareDocument(): void
     {
-        $user = Factory::getApplication()->getIdentity();
-        $canDo = ContentHelper::getActions('com_dnbooking', 'category', $this->state->get('filter.category_id'));
+        $app     = Factory::getApplication();
+        $menu    = $app->getMenu()->getActive();
+        $pathway = $app->getPathway();
+        $title   = null;
 
-        ToolbarHelper::title(Text::_('COM_DNBOOKING_HEADLINE_CUSTOMERS'), 'list com_dnbooking');
-
-        // Get the toolbar object instance
-        $toolbar = Toolbar::getInstance('toolbar');
-        if ($canDo->get('core.create') || \count($user->getAuthorisedCategories('com_dnbooking', 'core.create')) > 0)
-        {
-
-            $toolbar->addNew('customer.add');
+        // Because the application sets a default page title,
+        // we need to get it from the menu item itself
+        if ($menu) {
+            $this->params->def('page_heading', $this->params->get('page_title', $menu->title));
+        } else {
+            $this->params->def('page_heading', Text::_('COM_VMMAPICON_APIS'));
         }
 
-        if (!$this->isEmptyState && $canDo->get('core.edit'))
-        {
-            $dropdown = $toolbar->dropdownButton('status-group')
-                ->text('JTOOLBAR_CHANGE_STATUS')
-                ->toggleSplit(false)
-                ->icon('icon-ellipsis-h')
-                ->buttonClass('btn btn-action')
-                ->listCheck(true);
+        $title = $this->params->get('page_title', '');
 
-            $childBar = $dropdown->getChildToolbar();
-
-            $childBar->publish('customers.publish')->listCheck(true);
-
-            $childBar->unpublish('customers.unpublish')->listCheck(true);
-
-            $childBar->archive('customers.archive')->listCheck(true);
-
-            if ($this->state->get('filter.published') != -2)
-            {
-                $childBar->trash('customers.trash')->listCheck(true);
-            }
+        if (empty($title)) {
+            $title = $app->get('sitename');
+        } elseif ($app->get('sitename_pagetitles', 0) == 1) {
+            $title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $title);
+        } elseif ($app->get('sitename_pagetitles', 0) == 2) {
+            $title = Text::sprintf('JPAGETITLE', $title, $app->get('sitename'));
         }
 
-        if (!$this->isEmptyState && $this->state->get('filter.published') == -2 && $canDo->get('core.delete'))
-        {
-            $toolbar->delete('customers.delete')
-                ->text('JTOOLBAR_EMPTY_TRASH')
-                ->message('JGLOBAL_CONFIRM_DELETE')
-                ->listCheck(true);
+        $this->document->setTitle($title);
+
+        if ($this->params->get('menu-meta_description')) {
+            $this->document->setDescription($this->params->get('menu-meta_description'));
         }
 
-        if ($user->authorise('core.admin', 'com_dnbooking') || $user->authorise('core.options', 'com_dnbooking'))
-        {
-            $toolbar->preferences('com_dnbooking');
+        if ($this->params->get('menu-meta_keywords')) {
+            $this->document->setMetadata('keywords', $this->params->get('menu-meta_keywords'));
         }
 
-        ToolbarHelper::help('index', true);
-
+        if ($this->params->get('robots')) {
+            $this->document->setMetadata('robots', $this->params->get('robots'));
+        }
     }
 }

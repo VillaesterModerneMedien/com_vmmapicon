@@ -32,23 +32,69 @@ defined('_JEXEC') or die;
 */
 class plgSystemYtvmmapicon extends CMSPlugin
 {
+	protected $autoloadLanguage = true;
+	protected $app;
+	protected $db;
+
 	/**
-	 * onAfterInitialise.
+	 * onAfterInitialise - Try early registration
 	 *
 	 * @return  void
 	 *
 	 * @since   1.0.0
 	 */
-	public function onAfterInitialise ()
+	public function onAfterInitialise()
 	{
-	    // Check if YOOtheme Pro is loaded
-	    if (!class_exists(Application::class, false)) {
-	        return;
-	    }
-
-	    // Load a single module from the same directory
-	    $app = Application::getInstance();
-	    $app->load(__DIR__ . '/bootstrap.php');
+		$this->registerWithYooTheme();
 	}
 
+	/**
+	 * onAfterRoute - Try again after routing
+	 *
+	 * @return  void
+	 *
+	 * @since   1.0.0
+	 */
+	public function onAfterRoute()
+	{
+		$this->registerWithYooTheme();
+	}
+
+	/**
+	 * Register with YooTheme
+	 *
+	 * @return  void
+	 */
+	protected function registerWithYooTheme()
+	{
+		static $registered = false;
+
+		if ($registered) {
+			return;
+		}
+
+		// Check if YOOtheme Pro is loaded
+		if (!class_exists(Application::class, false)) {
+			return;
+		}
+
+		// Debug logging
+		if (defined('JDEBUG') && JDEBUG) {
+			error_log('YTVMMapicon: YooTheme Application found, registering provider');
+		}
+
+		try {
+			$app = Application::getInstance();
+			$app->load(__DIR__ . '/bootstrap.php');
+			$registered = true;
+
+			if (defined('JDEBUG') && JDEBUG) {
+				error_log('YTVMMapicon: Provider registered successfully');
+			}
+		} catch (\Exception $e) {
+			if (defined('JDEBUG') && JDEBUG) {
+				error_log('YTVMMapicon: Registration failed - ' . $e->getMessage());
+			}
+		}
+	}
 }

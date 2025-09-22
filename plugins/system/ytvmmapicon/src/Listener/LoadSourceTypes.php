@@ -31,20 +31,34 @@ class LoadSourceTypes
 {
     public function handle($source): void
     {
-        $query = [
-            ApiQueryType::config(),
-        ];
-
-        $types = [
-            ['Api', ApiType::config()],
-        ];
-
-        foreach ($query as $args) {
-            $source->queryType($args);
+        if (defined('JDEBUG') && JDEBUG) {
+            error_log('YTVMMapicon: LoadSourceTypes::handle called');
         }
 
-        foreach ($types as $args) {
-            $source->objectType(...$args);
+        try {
+            $query = [
+                ApiQueryType::config(),
+            ];
+
+            $types = [
+                ['Api', ApiType::config()],
+            ];
+
+            foreach ($query as $args) {
+                $source->queryType($args);
+            }
+
+            foreach ($types as $args) {
+                $source->objectType(...$args);
+            }
+
+            if (defined('JDEBUG') && JDEBUG) {
+                error_log('YTVMMapicon: Source types registered successfully');
+            }
+        } catch (\Exception $e) {
+            if (defined('JDEBUG') && JDEBUG) {
+                error_log('YTVMMapicon: Error registering source types - ' . $e->getMessage());
+            }
         }
     }
 }

@@ -27,20 +27,38 @@ use YOOtheme\Builder\Source;
 use YOOtheme\Config;
 use YOOtheme\Metadata;
 use YOOtheme\Url;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiType;
 
 class SourceListener
 {
-    public function initCustomizer( $config)
+    public static function initSource($source): void
     {
-        $config->merge([
-            'templates' => [
-                'com_vmmapicon.api' => [
-                    'label' => 'Api Result Singleview',
-                    'fieldset' => [
-                        'default' => [
-                            'fields' => [
+        $query = [
+            ApiQueryType::config(),
+        ];
 
-                            ],
+        $types = [
+            ['Api', ApiType::config()],
+        ];
+
+        foreach ($query as $args) {
+            $source->queryType($args);
+        }
+
+        foreach ($types as $args) {
+            $source->objectType(...$args);
+        }
+    }
+
+    public static function initCustomizer(Config $config, Metadata $metadata)
+    {
+        $config->add('customizer.templates', [
+            'com_vmmapicon.apiitem' => [
+                'label' => 'Api Result Singleview',
+                'fieldset' => [
+                    'default' => [
+                        'fields' => [
                         ],
                     ],
                 ],

@@ -41,7 +41,7 @@ class TemplateListener
 
         // match context and layout from view object
 
-        if ($context === 'com_vmmapicon.api' && $layout === 'default' && !$tpl) {
+        if ($context === 'com_vmmapicon.apiitem' && $layout === 'default' && !$tpl) {
 
             // return type, query and parameters of the matching view
             return [

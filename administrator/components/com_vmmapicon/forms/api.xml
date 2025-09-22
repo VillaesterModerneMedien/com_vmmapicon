@@ -34,7 +34,7 @@
         />
     </fieldset>
 
-    <fieldset name="apiParams"  addfieldprefix="Villaester\Component\Vmmapicon\Administrator\Field\Jsonselector">
+    <fieldset name="apiParams"  addfieldprefix="Villaester\Component\Vmmapicon\Administrator\Field\ApiMapping">
         <field
                 name="api_url"
                 type="text"
@@ -69,7 +69,7 @@
         </field>
         <field
             name="api_mapping"
-            type="Jsonselector"
+            type="ApiMapping"
             label="API Mapping"
             description="API Mapping eingeben"
             required="true"
@@ -77,6 +77,12 @@
         <field
             name="api_selectors"
             type="hidden"
+        />
+        <field
+            name="api_mapping_subform"
+            type="hidden"
+            default=""
+            filter="raw"
         />
         <field
                 name="api_params"

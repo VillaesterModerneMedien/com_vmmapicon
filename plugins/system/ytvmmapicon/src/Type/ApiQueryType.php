@@ -45,7 +45,7 @@ class ApiQueryType
                     ],
                     'metadata' => [
                         'label' => 'Api Response Single',
-                        'view' => ['com_vmmapicon.api'],
+                        'view' => ['com_vmmapicon.apiitem'],
                         'group' => 'Apis',
 
                         'fields' => [

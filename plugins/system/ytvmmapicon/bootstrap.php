@@ -1,40 +1,41 @@
 <?php
-/**  
- * 
- * 
- * \ \    / /  \/  |  \/  | 
- *  \ \  / /| \  / | \  / | 
- *   \ \/ / | |\/| | |\/| | 
- *    \  /  | |  | | |  | | 
- *     \/   |_|  |_|_|  |_| Villaester Moderne Medien GmbH * * @package Joomla.Component  
- * @subpackage  com_vmmapicon
- * @copyright   Copyright (C) 2025 Villaester Moderne Medien  
- * @author      Mario Hewera & Kiki Schuelling  
- * @license     GNU General Public License version 2 or later  
- * @author      VMM Development Team  
- * @link        https://villaester.de  
- * @version     1.0.0  
+/**
+ * YTVMMapicon Bootstrap
+ *
+ * @package     Joomla.Plugin
+ * @subpackage  System.ytvmmapicon
  */
 
-
 use YOOtheme\Builder;
-use YOOtheme\Builder\BuilderConfig;
-use Joomla\Plugin\System\Ytvmmapicon\Listener\SourceListener;
-use Joomla\Plugin\System\Ytvmmapicon\Listener\TemplateListener;
-use Joomla\Plugin\System\Ytvmmapicon\Listener\LoadSourceTypes;
-use Joomla\Plugin\System\Ytvmmapicon\Listener\LoadTemplate;
 use YOOtheme\Path;
 
+// Include all required classes directly
+include_once __DIR__ . '/src/Listener/LoadSourceTypes.php';
+include_once __DIR__ . '/src/Listener/SourceListener.php';
+include_once __DIR__ . '/src/Listener/TemplateListener.php';
+include_once __DIR__ . '/src/Type/ApiType.php';
+include_once __DIR__ . '/src/Type/ApiQueryType.php';
 
 return [
 
     'events' => [
-
-        'source.init'      => [LoadSourceTypes::class => '@handle'],
-        'builder.template' => [TemplateListener::class => '@matchTemplate'],
-
-        BuilderConfig::class => [SourceListener::class => '@initCustomizer'],
-
+        'source.init' => [
+            \Joomla\Plugin\System\Ytvmmapicon\Listener\LoadSourceTypes::class => ['handle', -20],
+        ],
+        'customizer.init' => [
+            \Joomla\Plugin\System\Ytvmmapicon\Listener\SourceListener::class => ['initCustomizer', -5],
+        ],
+        'builder.template' => [
+            \Joomla\Plugin\System\Ytvmmapicon\Listener\TemplateListener::class => 'matchTemplate',
+        ],
     ],
+
+    'extend' => [
+        Builder::class => function (Builder $builder) {
+            if (defined('JDEBUG') && JDEBUG) {
+                error_log('YTVMMapicon: Builder extended');
+            }
+        }
+    ]
 
 ];

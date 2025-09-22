@@ -1,0 +1,16 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "com_vmmapicon",
+  "version": "4.0.0",
+  "description": "VMM API Connector Assets",
+  "license": "GPL-2.0-or-later",
+  "assets": [
+    {
+      "name": "com_vmmapicon.apimapping_admin",
+      "type": "script",
+      "uri": "com_vmmapicon/js/apiMapping.js",
+      "version": "auto",
+      "attributes": { "defer": true }
+    }
+  ]
+}
