@@ -20,11 +20,8 @@
 
 namespace Joomla\Plugin\System\Ytvmmapicon\Listener;
 
-use Joomla\Plugin\System\Ytvmmapicon\Type\ApisQueryType;
-use Joomla\Plugin\System\Ytvmmapicon\Type\ApisType;
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiType;
-use Joomla\Plugin\System\Ytvmmapicon\Type\ApiimagesType;
 
 
 class LoadSourceTypes

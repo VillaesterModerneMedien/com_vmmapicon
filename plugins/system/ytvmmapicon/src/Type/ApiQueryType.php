@@ -77,8 +77,6 @@ class ApiQueryType
 
 	public static function resolve($item, $args, $context, $info)
 	{
-
-
 		return ApiTypeProvider::get($args['id']);
 	}
 

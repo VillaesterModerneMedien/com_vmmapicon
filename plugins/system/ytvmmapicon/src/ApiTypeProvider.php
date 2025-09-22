@@ -6,7 +6,7 @@ use Villaester\Component\Vmmapicon\Administrator\Helper\ApiHelper;
 
 
 /**
- * Custom Type Provider
+ * Custom Type Providerwfsdf
  *
  * @see https://yootheme.com/support/yootheme-pro/joomla/developers-sources#add-custom-sources
  */
@@ -45,23 +45,29 @@ class ApiTypeProvider
             return [];
         }
 
-        // Ersten Datensatz bestimmen: bevorzugt data[0], sonst erstes List-Element, sonst gesamtes Objekt
-        $first = null;
+        // Ersten Datensatz bestimmen und passenden JSON-Prefix setzen,
+        // damit die Pfade am Root korrekt aufgelöst werden (z. B. data->0->...)
+        $first  = null;
+        $prefix = [];
         if (is_array($apiData)) {
             if (isset($apiData['data']) && is_array($apiData['data']) && !empty($apiData['data'])) {
-                $first = $apiData['data'][0];
+                $first  = $apiData['data'][0];
+                $prefix = ['data', '0'];
             } elseif (!empty($apiData) && array_values($apiData) === $apiData) { // numerisch indiziert
-                $first = $apiData[0];
+                $first  = $apiData[0];
+                $prefix = ['0'];
             } else {
-                $first = $apiData; // assoziatives Array
+                $first  = $apiData; // assoziatives Array
+                $prefix = [];
             }
         } else {
-            $first = $apiData; // Objekt oder Skalar
+            $first  = $apiData; // Objekt oder Skalar
+            $prefix = [];
         }
 
         $names = [];
         $mapping = [];
-        self::flattenToMapping($first, [], $mapping, $names);
+        self::flattenToMapping($first, $prefix, $mapping, $names);
 
         return $mapping;
     }
@@ -133,6 +139,7 @@ class ApiTypeProvider
         if (is_float($value)) {
             return 'Float';
         }
+        // Arrays/Objekte, die hier nicht weiter aufgelöst wurden, als String serialisieren
         if (is_array($value) || is_object($value)) {
             // Arrays/Objekte als Liste von Strings ausgeben
             return 'listOf(String)';

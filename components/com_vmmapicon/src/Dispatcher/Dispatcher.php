@@ -33,7 +33,7 @@ class Dispatcher extends ComponentDispatcher
 {
 	/**
 	 * Dispatch a controller task. Redirecting the user if appropriate.
-	 *
+	 *wenn
 	 * @return  void
 	 *
 	 * @since   4.0.0

@@ -1,3 +1,8 @@
 
 .DS_Store
 .idea
+administrator/node_modules/
+
+administrator/package-lock.json
+
+administrator/package.json
