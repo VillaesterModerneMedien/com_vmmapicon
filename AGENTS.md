@@ -13,7 +13,7 @@
 https://joomla5.joomla.local/administrator
 Username: whykiki
 Password: 421BBdc0ad++
-
+warum is
 
 ## Coding Style & Naming Conventions
 - PHP: PSR‑12, 4‑space indent. Joomla namespaces (`Villaester\Component\Vmmapicon\…`). Keep files free of side effects; honor existing `phpcs` annotations.

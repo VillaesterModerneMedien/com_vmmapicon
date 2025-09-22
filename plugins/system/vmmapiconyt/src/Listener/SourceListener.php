@@ -20,17 +20,49 @@ class SourceListener
      *
      * @param Source $source
      */
-    public static function initSource($source)
+    public function initSource($source)
     {
-        error_log('VMMapiconYT SourceListener::initSource called (static)');
+        if (defined('JDEBUG') && JDEBUG) {
+            error_log('VMMapiconYT: initSource called - source class: ' . get_class($source));
+        }
 
-        // Register object types with dynamic fields
-        $source->objectType('VmmapiconApi', VmmapiconApiType::config());
+        try {
+            // First register a simple test type to verify registration works
+            $source->objectType('VmmapiconTest', \Villaester\Plugin\System\Vmmapiconyt\Type\TestType::config());
 
-        // Register query types
-        $source->queryType(VmmapiconApiQueryType::config());
+            // Register object types with dynamic fields
+            $source->objectType('VmmapiconApi', VmmapiconApiType::config());
 
-        error_log('VMMapiconYT SourceListener: Types registered successfully');
+            // Register query types
+            $source->queryType(VmmapiconApiQueryType::config());
+
+            // Also try to register a simple test query
+            $source->queryType([
+                'fields' => [
+                    'vmmapiconTest' => [
+                        'type' => 'String',
+                        'metadata' => [
+                            'label' => 'VMMapicon Test Query',
+                            'group' => 'VMMapicon'
+                        ],
+                        'extensions' => [
+                            'call' => function() {
+                                return 'VMMapicon is working!';
+                            }
+                        ]
+                    ]
+                ]
+            ]);
+
+            if (defined('JDEBUG') && JDEBUG) {
+                error_log('VMMapiconYT: Source types registered successfully');
+            }
+        } catch (\Exception $e) {
+            if (defined('JDEBUG') && JDEBUG) {
+                error_log('VMMapiconYT: Error registering source types - ' . $e->getMessage());
+                error_log('VMMapiconYT: Stack trace - ' . $e->getTraceAsString());
+            }
+        }
     }
 
     /**
@@ -39,35 +71,26 @@ class SourceListener
      * @param Config $config
      * @param Metadata $metadata
      */
-    public static function initCustomizer(Config $config, Metadata $metadata)
+    public function initCustomizer(Config $config, Metadata $metadata)
     {
-        error_log('VMMapiconYT SourceListener::initCustomizer called (static)');
+        // Align with ytdataset SourceListener structure
+        $config->add('customizer.vmmapicon', array(
+            [
+                'value' => 1,
+                'text'  => 'text',
+            ],
+        ));
 
-        // Add customizer configuration for API sources
-        $config->add('customizer.vmmapicon', [
-            'vmmapicon_source' => [
-                'label' => 'API Source',
-                'description' => 'Select an API configuration to use as data source',
-                'type' => 'select',
-                'default' => '',
-                'options' => self::getApiOptions()
-            ]
-        ]);
-
-        // Add templates configuration
         $config->add('customizer.templates', [
-            'com_vmmapicon.api' => [
-                'label' => 'VMMapicon API'
-            ]
+            'com_vmmapicon.apiitem' => [
+                'label' => 'VMMapicon API Item'
+            ],
         ]);
 
-        // Add JavaScript for customizer
         $metadata->set('script:customizer.vmmapicon', [
-            'src' => Url::to('plugins/system/vmmapiconyt/js/vmmapicon.js'),
-            'defer' => true
+            'src'   => Url::to('plugins/system/vmmapiconyt/js/vmmapicon.js'),
+            'defer' => true,
         ]);
-
-        error_log('VMMapiconYT SourceListener::initCustomizer completed');
     }    /**
      * Get available API options for customizer
      *
@@ -75,7 +98,8 @@ class SourceListener
      */
     protected static function getApiOptions()
     {
-        $options = ['' => 'None'];
+        // Return list of option objects: [{value: '', text: 'None'}, ...]
+        $options = [ [ 'value' => '', 'text' => 'None' ] ];
 
         try {
             $db = \Joomla\CMS\Factory::getDbo();
@@ -89,7 +113,7 @@ class SourceListener
             $apis = $db->loadObjectList();
 
             foreach ($apis as $api) {
-                $options[$api->id] = $api->title;
+                $options[] = [ 'value' => (string) $api->id, 'text' => $api->title ];
             }
 
         } catch (\Exception $e) {

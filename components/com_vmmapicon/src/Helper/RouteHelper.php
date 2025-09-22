@@ -32,8 +32,8 @@ abstract class RouteHelper
 	 *
 	 * @since   1.0.0
 	 */
-	public static function getApiRoute($id, $language = 0)
-	{
+    public static function getApiRoute($id, $language = 0)
+    {
 		// Create the link
 		$link = 'index.php?option=com_vmmapicon&view=api&apiID=' . $id;
 		
@@ -42,6 +42,26 @@ abstract class RouteHelper
 			$link .= '&lang=' . $language;
 		}
 
-		return $link;
-	}
+        return $link;
+    }
+
+    /**
+     * Get the URL for a single API item view
+     *
+     * @param integer $id API configuration ID
+     * @param integer $index Index within the result list
+     * @param string $path Optional path within JSON (e.g. data->items)
+     * @return string Link to apiitem
+     */
+    public static function getApiItemRoute($id, $index = 0, $path = '')
+    {
+        $link = 'index.php?option=com_vmmapicon&view=apiitem&id=' . (int) $id;
+        if ($index) {
+            $link .= '&index=' . (int) $index;
+        }
+        if ($path !== '') {
+            $link .= '&path=' . rawurlencode($path);
+        }
+        return $link;
+    }
 }

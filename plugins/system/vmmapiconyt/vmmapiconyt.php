@@ -6,8 +6,7 @@
  * @license     GNU General Public License version 2 or later
  */
 
-namespace Villaester\Plugin\System\Vmmapiconyt;
-
+// Main plugin class must be in global namespace for Joomla to instantiate
 use Joomla\CMS\Plugin\CMSPlugin;
 use YOOtheme\Application;
 
@@ -15,30 +14,103 @@ defined('_JEXEC') or die;
 
 class PlgSystemVmmapiconyt extends CMSPlugin
 {
-    protected $autoloadLanguage = true;
-    protected $app;
-    protected $db;
+	protected $autoloadLanguage = true;
+	protected $app;
+	protected $db;
 
-    /**
-     * Runs after the framework has loaded and the application initialise method has been called
-     */
-    public function onAfterInitialise()
-    {
-        // Debug: Log that plugin is being executed
-        error_log('VMMapiconYT Plugin: onAfterInitialise called');
+	/**
+	 * onAfterInitialise - Try early registration
+	 *
+	 * @return  void
+	 *
+	 * @since   1.0.0
+	 */
+	public function onAfterInitialise()
+	{
+		// Try registration early for backend
+		if ($this->app->isClient('administrator')) {
+			$this->registerWithYooTheme();
+		}
+	}
 
-        // Check if YOOtheme Pro is loaded
-        if (!class_exists(Application::class, false)) {
-            error_log('VMMapiconYT Plugin: YOOtheme Application class not found');
-            return;
-        }
+	/**
+	 * onAfterRoute - Try registration after routing
+	 *
+	 * @return  void
+	 *
+	 * @since   1.0.0
+	 */
+	public function onAfterRoute()
+	{
+		// Try registration for frontend and as fallback
+		$this->registerWithYooTheme();
+	}
 
-        error_log('VMMapiconYT Plugin: YOOtheme Application class found, loading bootstrap');
+	/**
+	 * onBeforeCompileHead - Last chance to register
+	 *
+	 * @return  void
+	 *
+	 * @since   1.0.0
+	 */
+	public function onBeforeCompileHead()
+	{
+		// Final attempt to register with YooTheme
+		$this->registerWithYooTheme();
+	}
 
-        // Load a single module from the same directory
-        $app = Application::getInstance();
-        $result = $app->load(__DIR__ . '/bootstrap.php');
+	/**
+	 * Register with YooTheme
+	 *
+	 * @return  void
+	 */
+	protected function registerWithYooTheme()
+	{
+		static $registered = false;
 
-        error_log('VMMapiconYT Plugin: Bootstrap loaded with result: ' . ($result ? 'success' : 'failed'));
-    }
+		if ($registered) {
+			return;
+		}
+
+		// Check if YOOtheme Pro is loaded - try autoload if not
+		if (!class_exists(Application::class, false)) {
+			// Try to find YooTheme in common locations
+			$paths = [
+				JPATH_ROOT . '/templates/yootheme/vendor/yootheme/theme/src/Application.php',
+				JPATH_ROOT . '/templates/yootheme_gantry/vendor/yootheme/theme/src/Application.php',
+				JPATH_ROOT . '/templates/yootheme/vendor/yootheme/application.php',
+			];
+
+			foreach ($paths as $path) {
+				if (file_exists($path)) {
+					require_once $path;
+					break;
+				}
+			}
+
+			// Check again after trying to load
+			if (!class_exists(Application::class, false)) {
+				return;
+			}
+		}
+
+		// Debug logging
+		if (defined('JDEBUG') && JDEBUG) {
+			error_log('VMMapiconYT: YooTheme Application found, registering provider');
+		}
+
+		try {
+			$app = Application::getInstance();
+			$app->load(__DIR__ . '/bootstrap.php');
+			$registered = true;
+
+			if (defined('JDEBUG') && JDEBUG) {
+				error_log('VMMapiconYT: Provider registered successfully');
+			}
+		} catch (\Exception $e) {
+			if (defined('JDEBUG') && JDEBUG) {
+				error_log('VMMapiconYT: Registration failed - ' . $e->getMessage());
+			}
+		}
+	}
 }

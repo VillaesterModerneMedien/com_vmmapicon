@@ -6,9 +6,9 @@
     <copyright>Copyright (C) 2025 Villaester Moderne Medien</copyright>
     <license>GNU General Public License version 2 or later</license>
     <authorEmail>info@villaester.de</authorEmail>
-    <authorUrl>https://villaester.de</authorUrl>
+    <authorUrl>https://villaester22.de</authorUrl>
     <version>1.0.0</version>
-    <description>PLG_SYSTEM_VMMAPICON_YOOTHEME_XML_DESCRIPTION</description>
+    <description>PLG_SYSTEM_VMMAPICONYT_XML_DESCRIPTION</description>
     <namespace path="src">Villaester\Plugin\System\Vmmapiconyt</namespace>
 
     <files>

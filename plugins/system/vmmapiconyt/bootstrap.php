@@ -10,19 +10,29 @@ namespace Villaester\Plugin\System\Vmmapiconyt;
 
 use YOOtheme\Builder;
 use YOOtheme\Path;
-use Villaester\Plugin\System\Vmmapiconyt\Listener\SourceListener;
-use Villaester\Plugin\System\Vmmapiconyt\Listener\TemplateListener;
-use Villaester\Plugin\System\Vmmapiconyt\Controller\SourceController;
-use Villaester\Plugin\System\Vmmapiconyt\VmmapiconApiProvider;
 
-include_once __DIR__ . '/src/Listener/SourceListener.php';
-include_once __DIR__ . '/src/Listener/TemplateListener.php';
-include_once __DIR__ . '/src/Controller/SourceController.php';
-include_once __DIR__ . '/src/VmmapiconApiProvider.php';
-include_once __DIR__ . '/src/Type/VmmapiconApiType.php';
-include_once __DIR__ . '/src/Type/VmmapiconApiQueryType.php';
+// Autoloader für Plugin-Klassen registrieren
+spl_autoload_register(function ($class) {
+    $prefix = 'Villaester\\Plugin\\System\\Vmmapiconyt\\';
+    $base_dir = __DIR__ . '/src/';
 
-error_log('VMMapiconYT Bootstrap: All classes included successfully');
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+
+// Debug logging
+if (defined('JDEBUG') && JDEBUG) {
+    error_log('VMMapiconYT Bootstrap: Loading configuration');
+}
 
 return [
 
@@ -33,17 +43,24 @@ return [
     ],
 
     'events' => [
+        // Use current YOOtheme event names to avoid double registration
         'source.init' => [
             SourceListener::class => ['initSource', -20],
         ],
-
         'customizer.init' => [
             SourceListener::class => ['initCustomizer', -5],
         ],
-
         'builder.template' => [
             TemplateListener::class => 'matchTemplate',
         ],
+    ],
+
+    'extend' => [
+        Builder::class => function (Builder $builder) {
+            if (defined('JDEBUG') && JDEBUG) {
+                error_log('VMMapiconYT: Builder extended');
+            }
+        }
     ]
 
 ];

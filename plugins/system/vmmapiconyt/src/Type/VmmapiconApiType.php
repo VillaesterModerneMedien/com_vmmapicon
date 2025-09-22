@@ -16,9 +16,7 @@ class VmmapiconApiType
     public static function config()
     {
         return [
-            'fields' => function() {
-                return self::getDynamicFields();
-            },
+            'fields' => self::getDynamicFields(),
 
             'metadata' => [
                 'type' => true,
@@ -93,17 +91,33 @@ class VmmapiconApiType
                         }
 
                         // Clean field name for YOOtheme
-                        $cleanFieldName = preg_replace('/[^a-zA-Z0-9_]/', '_', $targetField);
+                        $cleanFieldName = preg_replace('/[^a-zA-Z0-9_]/', '_', (string) $targetField);
+                        $cleanFieldName = trim($cleanFieldName, '_');
+                        if ($cleanFieldName === '') {
+                            continue; // skip invalid/empty names
+                        }
+                        if (preg_match('/^\d/', $cleanFieldName)) {
+                            $cleanFieldName = 'f_' . $cleanFieldName;
+                        }
+
+                        // Map GraphQL type from field_type when available
+                        $gqlType = 'String';
+                        if (is_array($config) && isset($config['field_type'])) {
+                            $gqlType = self::mapFieldType($config['field_type']);
+                        }
 
                         if (!isset($fields[$cleanFieldName])) {
                             $fields[$cleanFieldName] = [
-                                'type' => 'String', // Default to String, could be made dynamic
+                                'type' => $gqlType,
                                 'metadata' => [
                                     'label' => $targetField,
                                     'group' => 'API Data'
                                 ],
                                 'extensions' => [
-                                    'call' => __CLASS__ . '::resolveField'
+                                    'call' => [
+                                        'func' => __CLASS__ . '::resolveField',
+                                        'args' => []
+                                    ]
                                 ]
                             ];
                         }
@@ -113,6 +127,28 @@ class VmmapiconApiType
         }
 
         return $fields;
+    }
+
+    /**
+     * Map admin field_type to YOOtheme GraphQL type string
+     */
+    protected static function mapFieldType($type)
+    {
+        $type = is_string($type) ? strtolower($type) : 'string';
+        switch ($type) {
+            case 'number':
+            case 'float':
+            case 'int':
+                return 'Float';
+            case 'boolean':
+                return 'Boolean';
+            case 'array':
+            case 'object':
+                return ['listOf' => 'String'];
+            case 'string':
+            default:
+                return 'String';
+        }
     }
 
     /**

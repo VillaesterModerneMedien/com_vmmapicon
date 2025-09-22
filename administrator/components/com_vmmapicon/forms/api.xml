@@ -79,6 +79,12 @@
             type="hidden"
         />
         <field
+            name="api_mapping_subform"
+            type="hidden"
+            default=""
+            filter="raw"
+        />
+        <field
                 name="api_params"
                 type="subform"
                 label="test"

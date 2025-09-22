@@ -240,12 +240,26 @@ class VmmapiconApiProvider
                 // New format: {json_mapping0: {json_path: ..., yootheme_name: ...}}
                 $sourceField = $config['json_path'];
                 $targetField = $config['yootheme_name'];
+                $fieldType  = $config['field_type'] ?? 'String';
             } else {
                 continue;
             }
 
-            // Extract value from nested path (e.g., "data.attributes.title")
+            // Extract value from nested path (supports 'a->b->c' or 'a.b.c')
             $value = $this->extractValueFromPath($data, $sourceField);
+
+            // Clean and validate target field name
+            $cleanFieldName = preg_replace('/[^a-zA-Z0-9_]/', '_', (string) $targetField);
+            $cleanFieldName = trim($cleanFieldName, '_');
+            if ($cleanFieldName === '') {
+                continue;
+            }
+            if (preg_match('/^\d/', $cleanFieldName)) {
+                $cleanFieldName = 'f_' . $cleanFieldName;
+            }
+
+            // Coerce to expected type for GraphQL
+            $value = $this->coerceValue($value, $fieldType ?? 'String');
 
             // Clean field name for YooTheme (remove special characters)
             $cleanFieldName = preg_replace('/[^a-zA-Z0-9_]/', '_', $targetField);
@@ -265,7 +279,8 @@ class VmmapiconApiProvider
      */
     protected function extractValueFromPath($data, $path)
     {
-        $keys = explode('.', $path);
+        // Allow both 'a->b->c' and 'a.b.c'
+        $keys = preg_split('/->|\./', (string) $path) ?: [];
         $value = $data;
 
         foreach ($keys as $key) {
@@ -279,5 +294,53 @@ class VmmapiconApiProvider
         }
 
         return $value;
+    }
+
+    /**
+     * Coerce raw value to the desired field type for GraphQL
+     */
+    protected function coerceValue($value, $fieldType)
+    {
+        $t = is_string($fieldType) ? strtolower($fieldType) : 'string';
+        switch ($t) {
+            case 'number':
+            case 'float':
+            case 'int':
+                if (is_numeric($value)) {
+                    return (float) $value;
+                }
+                return null;
+            case 'boolean':
+                if (is_bool($value)) return $value;
+                if (is_string($value)) {
+                    $lv = strtolower($value);
+                    if ($lv === 'true' || $lv === '1') return true;
+                    if ($lv === 'false' || $lv === '0') return false;
+                }
+                if (is_numeric($value)) return ((int)$value) !== 0;
+                return null;
+            case 'array':
+            case 'object':
+                // Expect listOf(String) at GraphQL layer, return list of strings
+                if (is_array($value)) {
+                    // if list: map items; if assoc: wrap as single json string
+                    $isList = array_is_list($value);
+                    if ($isList) {
+                        return array_map(function($v){
+                            return is_scalar($v) ? (string)$v : json_encode($v, JSON_UNESCAPED_SLASHES);
+                        }, $value);
+                    }
+                    return [json_encode($value, JSON_UNESCAPED_SLASHES)];
+                }
+                if (is_object($value)) {
+                    return [json_encode($value, JSON_UNESCAPED_SLASHES)];
+                }
+                // Fallthrough to string
+            case 'string':
+            default:
+                if (is_scalar($value)) return (string) $value;
+                if ($value === null) return null;
+                return json_encode($value, JSON_UNESCAPED_SLASHES);
+        }
     }
 }

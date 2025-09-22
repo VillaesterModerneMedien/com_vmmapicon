@@ -91,6 +91,19 @@ class Router extends RouterView
     public function __construct(SiteApplication $app, AbstractMenu $menu, CategoryFactoryInterface $categoryFactory, DatabaseInterface $db)
     {
         parent::__construct($app, $menu);
+
+        // Register views for routing
+        $apis = new RouterViewConfiguration('apis');
+        $this->registerView($apis);
+
+        $apiitem = new RouterViewConfiguration('apiitem');
+        $apiitem->addKey('id');
+        $this->registerView($apiitem);
+
+        $this->attachRule(new StandardRules($this));
+        $this->attachRule(new MenuRules($this));
+        $this->attachRule(new NomenuRules($this));
+        $this->attachRule(new PreprocessRules($this));
     }
 
 }

@@ -19,20 +19,36 @@ class VmmapiconApiQueryType
     {
         return [
             'fields' => [
+                'vmmapiconPing' => [
+                    'type' => 'String',
+                    'metadata' => [
+                        'label' => 'VMMapicon Ping',
+                        'group' => 'VMMapicon'
+                    ],
+                    'extensions' => [
+                        'call' => [
+                            'func' => __CLASS__ . '::ping',
+                        ],
+                    ],
+                ],
                 'vmmapiconApi' => [
                     'type' => 'VmmapiconApi',
                     'args' => [
                         'id' => [
-                            'type' => 'String'
+                            'type' => 'String',
+                            'metadata' => [
+                                'label' => 'API ID'
+                            ]
                         ]
                     ],
                     'metadata' => [
                         'label' => 'VMMapicon API',
-                        'view' => ['com_vmmapicon.api'],
                         'group' => 'VMMapicon'
                     ],
                     'extensions' => [
-                        'call' => __CLASS__ . '::resolveApi'
+                        'call' => [
+                            'func' => __CLASS__ . '::resolveApi',
+                        ],
                     ]
                 ],
 
@@ -40,15 +56,24 @@ class VmmapiconApiQueryType
                     'type' => ['listOf' => 'VmmapiconApi'],
                     'metadata' => [
                         'label' => 'VMMapicon APIs (Multiple)',
-                        'view' => ['com_vmmapicon.apis'],
                         'group' => 'VMMapicon'
                     ],
                     'extensions' => [
-                        'call' => __CLASS__ . '::resolveApis'
+                        'call' => [
+                            'func' => __CLASS__ . '::resolveApis',
+                        ],
                     ]
                 ]
             ]
         ];
+    }
+
+    /**
+     * Simple ping to verify the Source is registered in YOOtheme
+     */
+    public static function ping($root, $args)
+    {
+        return 'ok';
     }
 
     /**

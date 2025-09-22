@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="1.0" group="system" method="upgrade">
+  <name>PLG_YTVMMAPICON</name>
+  <creationDate>29.05.2025</creationDate>
+  <author>Mario Hewera</author>
+  <authorEmail>mh@villaester.de</authorEmail>
+  <authorUrl>https://villaester.de</authorUrl>
+  <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+  <version>1.0</version>
+  <description>PLG_YTDATASET_XML_DESCRIPTION</description>
+  <namespace path="src">Joomla\Plugin\System\Ytvmmapicon</namespace>
+
+  <!-- Language files -->
+  <languages folder="language">
+    <language tag="de-DE">de-DE/de-DE.plg_system_ytvmmapicon.ini</language>
+    <language tag="de-DE">de-DE/de-DE.plg_system_ytvmmapicon.sys.ini</language>
+  </languages>
+
+  <!-- Plugin files -->
+  <files>
+    <filename plugin="ytvmmapicon">ytvmmapicon.php</filename>
+    <filename>bootstrap.php</filename>
+    <folder>language</folder>
+    <folder>src</folder>
+
+  </files>
+
+  <config>
+  </config>
+
+</extension>
