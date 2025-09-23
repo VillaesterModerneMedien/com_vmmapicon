@@ -44,6 +44,7 @@ class plgSystemYtvmmapicon extends CMSPlugin
 
         // Check if YOOtheme Pro is loaded
         if (!class_exists(Application::class, false)) {
+	        require_once JPATH_SITE . '/templates/yootheme/vendor/autoload.php';
             return;
         }
 

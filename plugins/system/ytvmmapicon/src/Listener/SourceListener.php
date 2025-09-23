@@ -19,14 +19,15 @@
 
 namespace Joomla\Plugin\System\Ytvmmapicon\Listener;
 
-use YOOtheme\Builder\Source;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiType;
 
 class SourceListener
 {
     public static function initSource($source): void
     {
         $source->objectType('ApiType', ApiType::config());
-        $source->queryType(ApiQUeryType::config());
+        $source->queryType(ApiQueryType::config());
     }
 
 }

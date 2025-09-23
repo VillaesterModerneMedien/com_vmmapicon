@@ -35,17 +35,15 @@ class ApiQueryType
         return [
 
             'fields' => [
-
                 'api' => [
-                    'type' => 'Api',
+                    'type' => 'ApiType',
                     'args' => [
 	                    'id' => [
-		                    'type' => 'String',
+		                    'type' => 'Int',
 	                    ],
                     ],
                     'metadata' => [
                         'label' => 'Api Response Single',
-                        'view' => ['com_vmmapicon.apiitem'],
                         'group' => 'Apis',
 
                         'fields' => [
@@ -54,26 +52,55 @@ class ApiQueryType
 		                        'description' => 'Api auswählen',
 		                        'type' => 'select',
 		                        'options' => $apiOptions,
-		                        // Hinweis für UI: Nach Änderung neu laden, damit Felder aktualisiert werden (Option B)
 		                        'reload' => true,
 		                        'refresh' => true,
 	                        ],
                         ],
                     ],
                     'extensions' => [
-	                    'call' => __CLASS__ . '::resolve',
+	                    'call' => [self::class, 'resolve'],
                     ],
                 ],
             ]
         ];
     }
-	public static function getApiOptions()
-	{
-		$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-		$options = $model->getApis();
+    public static function getApiOptions()
+    {
+        $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
+        $options = $model->getApis();
 
-		return $options;
-	}
+        // Normalize options for YOOtheme select: ensure 'value' and 'text' are strings
+        $normalized = [];
+        if (is_array($options)) {
+            foreach ($options as $opt) {
+                $value = null;
+                $text  = null;
+
+                if (is_array($opt)) {
+                    $value = $opt['value'] ?? ($opt['id'] ?? null);
+                    $text  = $opt['text']  ?? ($opt['title'] ?? ($opt['name'] ?? null));
+                } elseif (is_object($opt)) {
+                    $value = $opt->value ?? ($opt->id ?? null);
+                    $text  = $opt->text  ?? ($opt->title ?? ($opt->name ?? null));
+                } else {
+                    // Scalar fallback: use same as text and value
+                    $value = $opt;
+                    $text  = $opt;
+                }
+
+                if ($value === null || $text === null) {
+                    continue;
+                }
+
+                $normalized[] = [
+                    'value' => (string) $value,
+                    'text'  => (string) $text,
+                ];
+            }
+        }
+
+        return $normalized;
+    }
 
 	public static function resolve($item, $args, $context, $info)
 	{
@@ -81,4 +108,3 @@ class ApiQueryType
 	}
 
 }
-

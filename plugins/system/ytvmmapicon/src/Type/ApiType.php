@@ -20,13 +20,12 @@
 namespace Joomla\Plugin\System\Ytvmmapicon\Type;
 
 use Joomla\CMS\Factory;
-use Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider;
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
 
 
 class ApiType
 {
-	public static function config()
+	public static function config(): array
 	{
 		// Standardmäßig erstes veröffentlichtes API verwenden; bei Schema-Refresh nach ID-Änderung wird neu aufgebaut
 		$apiOptions = ApiQueryType::getApiOptions();
@@ -37,17 +36,22 @@ class ApiType
 		if ($apiId !== null) {
 			// Mapping nur aus der Komponente laden (kein APICall im Schemaaufbau)
 			$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-			$mapping = $model->getMapping($apiId) ?? [];
+			$mapping = $model->getMapping((int) $apiId) ?? [];
 
 			foreach ($mapping as $field) {
+				// Ensure we always provide a valid GraphQL field name (string, no leading digit)
+				$nameRaw = (string) ($field['yootheme_name'] ?? '');
+				$name = self::sanitizeFieldName($nameRaw);
+				if ($name === '') {
+					// Skip invalid/empty names to avoid schema errors
+					continue;
+				}
+
 				$typeDecl = self::toGraphQLTypeDecl($field['field_type'] ?? 'String');
-				$fields[$field['yootheme_name']] = [
+				$fields[$name] = [
 					'type' => $typeDecl,
 					'metadata' => [
-						'label' => $field['field_label'] ?? $field['yootheme_name'],
-					],
-					'extensions' => [
-						'call' => __CLASS__ . '::resolve',
+						'label' => $field['field_label'] ?? $nameRaw,
 					],
 				];
 			}
@@ -58,19 +62,25 @@ class ApiType
 
 			'metadata' => [
 				'type' => true,
-				'label' => 'Api Response',
+				'label' => 'Api Response'
 			],
+			'extensions' => [
+				'call' => [self::class, 'resolve'],
+			],
+
 		];
 	}
 
-	public static function resolve($item, $args, $context, $info)
+	public function resolve($item, $args, $context, $info)
 	{
 
 		if (isset($item->api_data) && isset($item->mapping_fields)) {
 			$fieldName = $info->fieldName;
 
 			foreach ($item->mapping_fields as $mappingItem) {
-				if (($mappingItem['yootheme_name'] ?? null) === $fieldName) {
+				// Compare with sanitized field name used in the schema
+				$targetName = self::sanitizeFieldName((string) ($mappingItem['yootheme_name'] ?? ''));
+				if ($targetName === $fieldName) {
 					$value = self::extractValueFromPath($item->api_data, $mappingItem['json_path'] ?? '');
 					$type  = $mappingItem['field_type'] ?? 'String';
 
@@ -105,6 +115,21 @@ class ApiType
 		}
 
 		return null;
+	}
+
+	private static function sanitizeFieldName(string $name): string
+	{
+		// Allow only letters, digits, underscore; collapse others to underscore
+		$clean = preg_replace('/[^A-Za-z0-9_]/', '_', $name ?? '');
+		$clean = trim((string) $clean, '_');
+		if ($clean === '') {
+			return '';
+		}
+		// GraphQL/YOOtheme requires names not starting with a digit
+		if (preg_match('/^\d/', $clean)) {
+			$clean = 'f_' . $clean;
+		}
+		return $clean;
 	}
 
 	private static function extractValueFromPath($data, $path)

@@ -20,7 +20,7 @@
 
 use YOOtheme\Builder;
 use YOOtheme\Path;
-use YOOtheme\Theme\Styler\StylerConfig;
+use Joomla\Plugin\System\Ytvmmapicon\Listener\SourceListener;
 
 
 
@@ -29,15 +29,12 @@ include_once __DIR__ . '/src/ApiTypeProvider.php';
 include_once __DIR__ . '/src/Type/ApiType.php';
 include_once __DIR__ . '/src/Type/ApiQueryType.php';
 
+
 return [
 
     'events' => [
-
         'source.init' => [
-            SourceListener::class => 'initSource',
+            SourceListener::class => 'initSource'
         ],
-
-
     ],
-
 ];
