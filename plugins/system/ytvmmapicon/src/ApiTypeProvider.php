@@ -28,7 +28,11 @@ class ApiTypeProvider
 		$item->mapping_fields = $model->getMapping($id) ?: [];
         $item->api_data = $apiData;
 
-        return $item;
+	    //return (object) ['my_field' => "The data for id: {$id}"];
+
+	    $data = $apiData['data'][0]['attributes']['title'];
+	    return (object) ['beitragstitel2' => $data, 'beitragstitel3' => "tschö"];
+		//return $item;
     }
 
 }

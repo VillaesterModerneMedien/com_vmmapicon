@@ -40,8 +40,7 @@ class ApiType
 
 			foreach ($mapping as $field) {
 				// Ensure we always provide a valid GraphQL field name (string, no leading digit)
-				$nameRaw = (string) ($field['yootheme_name'] ?? '');
-				$name = self::sanitizeFieldName($nameRaw);
+				$name = self::sanitizeFieldName($field['yootheme_name'] );
 				if ($name === '') {
 					// Skip invalid/empty names to avoid schema errors
 					continue;
@@ -51,28 +50,35 @@ class ApiType
 				$fields[$name] = [
 					'type' => $typeDecl,
 					'metadata' => [
-						'label' => $field['field_label'] ?? $nameRaw,
+						'label' => $field['field_label'] ?? $name,
 					],
+					'extensions' => [
+						'call' => __CLASS__ . '::resolve'
+					]
 				];
 			}
 		}
 
-		return [
+		$mappedFields = [
 			'fields' => $fields,
 
 			'metadata' => [
 				'type' => true,
 				'label' => 'Api Response'
-			],
-			'extensions' => [
-				'call' => [self::class, 'resolve'],
-			],
-
+			]
 		];
+
+		return $mappedFields;
+
 	}
 
-	public function resolve($item, $args, $context, $info)
+	public static function resolve($item, $args, $context, $info)
 	{
+		$a = $item;
+
+		$d = $info;
+		$field = $info->fieldName;
+		return $item->$field;
 
 		if (isset($item->api_data) && isset($item->mapping_fields)) {
 			$fieldName = $info->fieldName;
