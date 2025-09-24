@@ -293,7 +293,7 @@ class ApiModel extends AdminModel
 		$options = [];
 		foreach ($apis as $api) {
 			$options[] = [
-				'value' => (string) $api->id,
+				'value' => $api->id,
 				'text' => $api->id . ' - ' . $api->title
 			];
 		}
