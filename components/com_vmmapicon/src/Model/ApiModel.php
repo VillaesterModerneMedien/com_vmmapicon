@@ -85,7 +85,7 @@ class ApiModel extends ItemModel
                     ->select(
                         $this->getState(
                             'item.select',
-                            'a.id, a.title, a.alias, a.api_url, a.api_method, a.api_params, a.api_mapping, ' .
+                            'a.id, a.title, a.alias, a.api_url, a.api_method, a.api_params, ' .
                             'a.published, a.created, a.created_by, a.modified, a.modified_by, a.access, ' .
                             'a.params, a.metakey, a.metadesc, a.metadata'
                         )
@@ -152,54 +152,5 @@ class ApiModel extends ItemModel
             ];
         }
         return $options;
-    }
-
-    /**
-     * Method to get the mapping for an API
-     *
-     * @param   int  $apiId  The API ID
-     *
-     * @return  array  Mapping data
-     *
-     * @since   1.0.0
-     */
-    public function getMapping($apiId = null)
-    {
-        if (!$apiId) {
-            $apiId = $this->getState('api.id');
-        }
-
-        $item = $this->getItem($apiId);
-
-        if (!$item || empty($item->api_mapping)) {
-            return [];
-        }
-
-        $mappingData = json_decode($item->api_mapping, true);
-        if (!$mappingData) {
-            return [];
-        }
-
-        // Mapping comes as { json_mapping0: {...}, json_mapping1: {...} }
-        $flat = array_values($mappingData);
-
-        // Normalize types
-        foreach ($flat as &$entry) {
-            $type = $entry['field_type'] ?? 'String';
-            if (in_array($type, ['Object','Array'], true)) {
-                $entry['field_type'] = 'listOf(String)';
-                continue;
-            }
-            if (!isset($entry['field_type']) || !is_string($entry['field_type'])) {
-                $entry['field_type'] = 'String';
-            }
-            $valid = ['String','Int','Float','Boolean','listOf(String)'];
-            if (!in_array($entry['field_type'], $valid, true)) {
-                $entry['field_type'] = 'String';
-            }
-        }
-        unset($entry);
-
-        return $flat;
     }
 }

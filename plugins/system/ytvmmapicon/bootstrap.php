@@ -17,24 +17,27 @@
  */
 
 
-
-use YOOtheme\Builder;
-use YOOtheme\Path;
 use Joomla\Plugin\System\Ytvmmapicon\Listener\SourceListener;
+use Joomla\Plugin\System\Ytvmmapicon\Listener\TemplateListener;
 
-
-
-include_once __DIR__ . '/src/Listener/SourceListener.php';
 include_once __DIR__ . '/src/ApiTypeProvider.php';
+include_once __DIR__ . '/src/Type/ApiImage.php';
 include_once __DIR__ . '/src/Type/ApiType.php';
 include_once __DIR__ . '/src/Type/ApiQueryType.php';
 
 
 return [
-
     'events' => [
         'source.init' => [
             SourceListener::class => 'initSource'
+        ],
+        // Registriert Template-Matching für Joomla-Views
+        'view' => [
+            TemplateListener::class => 'matchTemplate'
+        ],
+        // Registriert Template-Typen in der YOOtheme Template-Übersicht
+        'builder.templates' => [
+            TemplateListener::class => 'registerTemplates'
         ],
     ],
 ];

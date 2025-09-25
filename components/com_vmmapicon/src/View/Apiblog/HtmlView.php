@@ -1,5 +1,5 @@
 <?php
-namespace Villaester\Component\Vmmapicon\Site\View\Apiitem;
+namespace Villaester\Component\Vmmapicon\Site\View\Apiblog;
 
 \defined('_JEXEC') or die;
 
@@ -9,23 +9,18 @@ use Joomla\CMS\Language\Text;
 
 class HtmlView extends BaseHtmlView
 {
-    protected $item;
-    protected $params;
+    protected $items;
     protected $state;
-    protected $pageclass_sfx = '';
+    protected $params;
 
     public function display($tpl = null): void
     {
-        $this->item   = $this->get('Item');
-        $this->state  = $this->get('State');
-        $this->params = $this->state->get('params');
+        $this->items      = $this->get('Items');
+        $this->state      = $this->get('State');
+        $this->params     = $this->state->get('params');
 
         if (count($errors = $this->get('Errors'))) {
             throw new \Exception(implode("\n", $errors), 500);
-        }
-
-        if ($this->item === null) {
-            throw new \Exception(Text::_('COM_VMMAPICON_ERROR_API_NOT_FOUND'), 404);
         }
 
         parent::display($tpl);

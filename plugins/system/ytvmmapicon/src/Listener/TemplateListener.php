@@ -20,6 +20,7 @@
 namespace Joomla\Plugin\System\Ytvmmapicon\Listener;
 
 use Joomla\CMS\Document\Document;
+use Joomla\CMS\Language\Text;
 
 class TemplateListener
 {
@@ -36,18 +37,47 @@ class TemplateListener
             return null;
         }
 
-        $layout = $view->getLayout();
-        $context = $view->get('context');
+        $layout = method_exists($view, 'getLayout') ? $view->getLayout() : null;
+        $viewName = method_exists($view, 'getName') ? $view->getName() : null;
+        $viewName = $viewName ? strtolower($viewName) : null;
 
-        // match context and layout from view object
+        // Standard-Layouts matchen
+        if ($layout && $layout !== 'default') {
+            return null;
+        }
 
-        if ($context === 'com_vmmapicon.apiitem' && $layout === 'default' && !$tpl) {
-
-            // return type, query and parameters of the matching view
+        // Api-Single (Element per itemId)
+        if ($viewName === 'apisingle') {
             return [
-                'type' => $context,
+                'type' => 'com_vmmapicon.apisingle',
                 'params' => ['item' => $view->get('item')],
             ];
         }
+
+        // Api-Blog (Liste)
+        if ($viewName === 'apiblog') {
+            return [
+                'type' => 'com_vmmapicon.apiblog',
+                'params' => ['items' => $view->get('items')],
+            ];
+        }
+
+        return null;
+    }
+
+    public static function registerTemplates(array $templates): array
+    {
+        // Registriere die beiden Template-Typen für den Builder-Dialog
+        $templates['com_vmmapicon.apiblog'] = [
+            'label' => Text::_('COM_VMMAPICON_APIBLOG_VIEW_DEFAULT_TITLE'),
+            'group' => 'VMMapicon',
+            'icon'  => 'database',
+        ];
+        $templates['com_vmmapicon.apisingle'] = [
+            'label' => Text::_('COM_VMMAPICON_APISINGLE_VIEW_DEFAULT_TITLE'),
+            'group' => 'VMMapicon',
+            'icon'  => 'file-text',
+        ];
+        return $templates;
     }
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_VMMAPICON_APIBLOG_VIEW_DEFAULT_TITLE" option="COM_VMMAPICON_APIBLOG_VIEW_DEFAULT_OPTION">
+		<help key="Menu_Item:_Api_Blog"/>
+		<message>
+			<![CDATA[COM_VMMAPICON_APIBLOG_VIEW_DEFAULT_DESC]]>
+		</message>
+	</layout>
+
+	<fields name="request">
+		<fieldset name="request" addfieldprefix="Villaester\Component\Vmmapicon\Site\Field">
+			<field name="id"
+			       type="Apis"
+			       label="COM_VMMAPICON_FIELD_API_LABEL"
+			       description="COM_VMMAPICON_FIELD_API_DESC"
+			       required="true" />
+		</fieldset>
+	</fields>
+
+	<fields name="params">
+		<fieldset name="basic" label="COM_VMMAPICON_ATTRIBS_API_SETTINGS_LABEL">
+			<field name="page_title" type="text" label="JGLOBAL_TITLE" />
+		</fieldset>
+	</fields>
+</metadata>
+

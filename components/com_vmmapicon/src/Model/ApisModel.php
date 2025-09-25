@@ -65,7 +65,7 @@ class ApisModel extends ListModel
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id, a.title, a.alias, a.api_url, a.api_method, a.api_params, a.api_mapping, ' .
+                'a.id, a.title, a.alias, a.api_url, a.api_method, a.api_params, ' .
                 'a.published, a.created, a.created_by, a.modified, a.modified_by, a.access'
             )
         )

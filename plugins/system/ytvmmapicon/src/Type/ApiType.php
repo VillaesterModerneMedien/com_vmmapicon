@@ -8,192 +8,76 @@
  *    \  /  | |  | | |  | | 
  *     \/   |_|  |_|_|  |_| Villaester Moderne Medien GmbH * * @package Joomla.Component  
  * @subpackage  com_vmmapicon
- * @copyright   Copyright (C) 2025 Villaester Moderne Medien  
- * @author      Mario Hewera & Kiki Schuelling  
- * @license     GNU General Public License version 2 or later  
- * @author      VMM Development Team  
- * @link        https://villaester.de  
- * @version     1.0.0  
  */
 
-//
 namespace Joomla\Plugin\System\Ytvmmapicon\Type;
-
-use Joomla\CMS\Factory;
-use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
-
 
 class ApiType
 {
-	public static function config(): array
-	{
-		// Standardmäßig erstes veröffentlichtes API verwenden; bei Schema-Refresh nach ID-Änderung wird neu aufgebaut
-		$apiOptions = ApiQueryType::getApiOptions();
-		$apiId = $apiOptions[0]['value'] ?? null;
+    public static function config(): array
+    {
+        return [
+            'fields' => [
+                // Grunddaten
+                'id' => [ 'type' => 'String', 'metadata' => ['label' => 'ID'] ],
+                'type' => [ 'type' => 'String', 'metadata' => ['label' => 'Type'] ],
+                'title' => [ 'type' => 'String', 'metadata' => ['label' => 'Titel'] ],
+                'alias' => [ 'type' => 'String', 'metadata' => ['label' => 'Alias'] ],
+                'state' => [ 'type' => 'Int', 'metadata' => ['label' => 'State'] ],
+                'access' => [ 'type' => 'Int', 'metadata' => ['label' => 'Access'] ],
+                'created' => [ 'type' => 'String', 'metadata' => ['label' => 'Created'] ],
+                'created_by' => [ 'type' => 'String', 'metadata' => ['label' => 'Created By'] ],
+                'modified' => [ 'type' => 'String', 'metadata' => ['label' => 'Modified'] ],
+                'featured' => [ 'type' => 'Int', 'metadata' => ['label' => 'Featured'] ],
+                'language' => [ 'type' => 'String', 'metadata' => ['label' => 'Language'] ],
+                'hits' => [ 'type' => 'Int', 'metadata' => ['label' => 'Hits'] ],
+                'publish_up' => [ 'type' => 'String', 'metadata' => ['label' => 'Publish Up'] ],
+                'publish_down' => [ 'type' => 'String', 'metadata' => ['label' => 'Publish Down'] ],
+                'note' => [ 'type' => 'String', 'metadata' => ['label' => 'Note'] ],
 
-		$fields = [];
+                // Bilder
+                'image_intro' => [ 'type' => 'String', 'metadata' => ['label' => 'Image Intro'] ],
+                'image_intro_alt' => [ 'type' => 'String', 'metadata' => ['label' => 'Image Intro Alt'] ],
+                'image_fulltext' => [ 'type' => 'String', 'metadata' => ['label' => 'Image Fulltext'] ],
+                'image_fulltext_alt' => [ 'type' => 'String', 'metadata' => ['label' => 'Image Fulltext Alt'] ],
 
-		if ($apiId !== null) {
-			// Mapping nur aus der Komponente laden (kein APICall im Schemaaufbau)
-			$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-			$mapping = $model->getMapping((int) $apiId) ?? [];
+                // Metadaten
+                'metakey' => [ 'type' => 'String', 'metadata' => ['label' => 'Meta Keywords'] ],
+                'metadesc' => [ 'type' => 'String', 'metadata' => ['label' => 'Meta Description'] ],
+                'metadata_robots' => [ 'type' => 'String', 'metadata' => ['label' => 'Robots'] ],
+                'metadata_author' => [ 'type' => 'String', 'metadata' => ['label' => 'Author'] ],
+                'metadata_rights' => [ 'type' => 'String', 'metadata' => ['label' => 'Rights'] ],
 
-			foreach ($mapping as $field) {
-				// Ensure we always provide a valid GraphQL field name (string, no leading digit)
-				$nameRaw = (string) ($field['yootheme_name'] ?? '');
-				$name = self::sanitizeFieldName($nameRaw);
-				if ($name === '') {
-					// Skip invalid/empty names to avoid schema errors
-					continue;
-				}
+                // Weitere Felder
+                'version' => [ 'type' => 'Int', 'metadata' => ['label' => 'Version'] ],
+                'featured_up' => [ 'type' => 'String', 'metadata' => ['label' => 'Featured Up'] ],
+                'featured_down' => [ 'type' => 'String', 'metadata' => ['label' => 'Featured Down'] ],
+                'typeAlias' => [ 'type' => 'String', 'metadata' => ['label' => 'Type Alias'] ],
+                'text' => [ 'type' => 'String', 'metadata' => ['label' => 'Text'] ],
+                'testfeld' => [ 'type' => 'String', 'metadata' => ['label' => 'Testfeld'] ],
+                'bilder' => [
+                    'type' => ['listOf' => 'ApiImage'],
+                    'metadata' => [ 'label' => 'Bilder' ],
+                ],
 
-				$typeDecl = self::toGraphQLTypeDecl($field['field_type'] ?? 'String');
-				$fields[$name] = [
-					'type' => $typeDecl,
-					'metadata' => [
-						'label' => $field['field_label'] ?? $nameRaw,
-					],
-				];
-			}
-		}
+                // Beziehungen
+                'category_id' => [ 'type' => 'String', 'metadata' => ['label' => 'Category ID'] ],
+                'author_id' => [ 'type' => 'String', 'metadata' => ['label' => 'Author ID'] ],
+                'tags_ids' => [ 'type' => ['listOf' => 'String'], 'metadata' => ['label' => 'Tag IDs'] ],
 
-		return [
-			'fields' => $fields,
+                // Links
+                'self_link' => [ 'type' => 'String', 'metadata' => ['label' => 'Self Link'] ],
 
-			'metadata' => [
-				'type' => true,
-				'label' => 'Api Response'
-			],
-			'extensions' => [
-				'call' => [self::class, 'resolve'],
-			],
+                // Rohdaten für Debug
+                'raw' => [ 'type' => 'String', 'metadata' => ['label' => 'Raw API Data'] ],
+            ],
+            'metadata' => [ 'type' => true, 'label' => 'Api Response' ],
+        ];
+    }
 
-		];
-	}
-
-	public function resolve($item, $args, $context, $info)
-	{
-
-		if (isset($item->api_data) && isset($item->mapping_fields)) {
-			$fieldName = $info->fieldName;
-
-			foreach ($item->mapping_fields as $mappingItem) {
-				// Compare with sanitized field name used in the schema
-				$targetName = self::sanitizeFieldName((string) ($mappingItem['yootheme_name'] ?? ''));
-				if ($targetName === $fieldName) {
-					$value = self::extractValueFromPath($item->api_data, $mappingItem['json_path'] ?? '');
-					$type  = $mappingItem['field_type'] ?? 'String';
-
-					// listOf(String): immer ein Array von Strings zurückgeben
-					if (self::isListOf($type)) {
-						if ($value === null) {
-							return [];
-						}
-						if (!is_array($value)) {
-							// Objekt oder Skalar in ein 1-Element-Array serialisieren
-							if (is_object($value) || is_array($value)) {
-								return [json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)];
-							}
-							return [(string) $value];
-						}
-						// Array-Elemente in Strings umwandeln
-						return array_map(function($v){
-							if (is_scalar($v) || $v === null) {
-								return $v === null ? '' : (string) $v;
-							}
-							return json_encode($v, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-						}, $value);
-					}
-
-					// Skalar: nie ein Array/Objekt zurückgeben
-					if (is_array($value) || is_object($value)) {
-						return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-					}
-					return $value;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	private static function sanitizeFieldName(string $name): string
-	{
-		// Allow only letters, digits, underscore; collapse others to underscore
-		$clean = preg_replace('/[^A-Za-z0-9_]/', '_', $name ?? '');
-		$clean = trim((string) $clean, '_');
-		if ($clean === '') {
-			return '';
-		}
-		// GraphQL/YOOtheme requires names not starting with a digit
-		if (preg_match('/^\d/', $clean)) {
-			$clean = 'f_' . $clean;
-		}
-		return $clean;
-	}
-
-	private static function extractValueFromPath($data, $path)
-	{
-		$pathSegments = $path !== '' ? explode('->', $path) : [];
-		$current = $data;
-
-		for ($i = 0, $n = count($pathSegments); $i < $n; $i++) {
-			$segment = $pathSegments[$i];
-
-			if (is_array($current)) {
-				if (array_key_exists($segment, $current)) {
-					$current = $current[$segment];
-					continue;
-				}
-				// Wenn es eine Liste ist und der nächste Schlüssel nicht numerisch ist, nimm Index 0 implizit
-				$keys = array_keys($current);
-				$sequential = $keys === range(0, count($current) - 1);
-				if ($sequential && isset($current[0])) {
-					// Falls der aktuelle Segmentname eigentlich ein Index ist, nutze ihn
-					if (ctype_digit((string) $segment) && isset($current[(int) $segment])) {
-						$current = $current[(int) $segment];
-						continue;
-					}
-					// Andernfalls implizit erstes Element und denselben Segmentnamen erneut versuchen
-					$current = $current[0];
-					$i--; // denselben Segmentnamen erneut prüfen
-					continue;
-				}
-				return null;
-			}
-			elseif (is_object($current)) {
-				if (isset($current->$segment)) {
-					$current = $current->$segment;
-					continue;
-				}
-				return null;
-			}
-			else {
-				return null;
-			}
-		}
-
-		return $current;
-	}
-
-	private static function toGraphQLTypeDecl(string $type)
-	{
-		$scalar = ['String','Int','Float','Boolean'];
-		if (in_array($type, $scalar, true)) {
-			return $type;
-		}
-		if (self::isListOf($type)) {
-			$inner = trim(substr($type, strlen('listOf('), -1)) ?: 'String';
-			if (!in_array($inner, $scalar, true)) {
-				$inner = 'String';
-			}
-			return ['listOf' => $inner];
-		}
-		return 'String';
-	}
-
-	private static function isListOf(string $type): bool
-	{
-		return str_starts_with($type, 'listOf(') && str_ends_with($type, ')');
-	}
+    public static function resolve($item, $args, $context, $info)
+    {
+        $field = $info->fieldName;
+        return $item->$field ?? null;
+    }
 }

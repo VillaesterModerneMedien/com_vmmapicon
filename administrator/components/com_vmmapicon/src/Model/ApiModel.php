@@ -16,6 +16,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Object\CMSObject;
+use Joomla\CMS\Table\Table;
 use Joomla\CMS\Versioning\VersionableModelTrait;
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
@@ -279,65 +280,24 @@ class ApiModel extends AdminModel
         return parent::canEditState($record);
     }
 
-	public function getApis(){
-		$db = Factory::getDbo();
-		$query = $db->getQuery(true)
-			->select(['id', 'title'])
-			->from('#__vmmapicon_apis')
-			->where('published = 1')
-			->order('title ASC');
+    public function getApis(){
+        $db = Factory::getDbo();
+        $query = $db->getQuery(true)
+            ->select(['id', 'title'])
+            ->from('#__vmmapicon_apis')
+            ->where('published = 1')
+            ->order('title ASC');
 
-		$db->setQuery($query);
-		$apis = $db->loadObjectList();
+        $db->setQuery($query);
+        $apis = $db->loadObjectList();
 
-		$options = [];
-		foreach ($apis as $api) {
-			$options[] = [
-				'value' => $api->id,
-				'text' => $api->id . ' - ' . $api->title
-			];
-		}
-		return $options;
-	}
-
-	// administrator/components/com_vmmapicon/src/Model/ApiModel.php
-	public function getMapping($apiId = null)
-	{
-		if (!$apiId) {
-			$apiId = $this->getState($this->getName() . '.id');
-		}
-
-		$item = $this->getItem($apiId);
-
-		if (!$item || empty($item->api_mapping)) {
-			return [];
-		}
-
-		$mappingData = json_decode($item->api_mapping, true);
-		if (!$mappingData) {
-			return [];
-		}
-
-		// Mapping kommt als { json_mapping0: {...}, json_mapping1: {...} }
-		$flat = array_values($mappingData);
-
-		// Typen normalisieren
-		foreach ($flat as &$entry) {
-			$type = $entry['field_type'] ?? 'String';
-			if (in_array($type, ['Object','Array'], true)) {
-				$entry['field_type'] = 'listOf(String)';
-				continue;
-			}
-			if (!isset($entry['field_type']) || !is_string($entry['field_type'])) {
-				$entry['field_type'] = 'String';
-			}
-			$valid = ['String','Int','Float','Boolean','listOf(String)'];
-			if (!in_array($entry['field_type'], $valid, true)) {
-				$entry['field_type'] = 'String';
-			}
-		}
-		unset($entry);
-
-		return $flat;
-	}
+        $options = [];
+        foreach ($apis as $api) {
+            $options[] = [
+                'value' => (string) $api->id,
+                'text' => $api->id . ' - ' . $api->title
+            ];
+        }
+        return $options;
+    }
 }

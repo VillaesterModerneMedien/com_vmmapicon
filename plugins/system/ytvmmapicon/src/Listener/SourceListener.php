@@ -21,11 +21,13 @@ namespace Joomla\Plugin\System\Ytvmmapicon\Listener;
 
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiType;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiImage;
 
 class SourceListener
 {
     public static function initSource($source): void
     {
+        $source->objectType('ApiImage', ApiImage::config());
         $source->objectType('ApiType', ApiType::config());
         $source->queryType(ApiQueryType::config());
     }

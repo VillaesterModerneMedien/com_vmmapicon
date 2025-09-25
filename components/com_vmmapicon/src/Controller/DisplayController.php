@@ -1,23 +1,4 @@
 <?php
-/**
- *
- *
- * \ \    / /  \/  |  \/  |
- *  \ \  / /| \  / | \  / |
- *   \ \/ / | |\/| | |\/| |
- *    \  /  | |  | | |  | |
- *     \/   |_|  |_|_|  |_| Villaester Moderne Medien GmbH
- *
- * @package Joomla.Component
- * @subpackage  com_vmmapicon
- * @copyright   Copyright (C) 2025 Villaester Moderne Medien
- * @author      Mario Hewera & Kiki Schuelling
- * @license     GNU General Public License version 2 or later
- * @author      VMM Development Team
- * @link        https://villaester.de
- * @version     1.0.0
- */
-
 namespace Villaester\Component\Vmmapicon\Site\Controller;
 
 \defined('_JEXEC') or die;
@@ -33,62 +14,58 @@ use Joomla\CMS\Factory;
  */
 class DisplayController extends BaseController
 {
-/**
-	 * The default view.
-	 *
-	 * @var    string
-	 * @since  1.6
-	 */
-	protected $default_view = 'apis';
+    /**
+     * The default view.
+     *
+     * @var    string
+     * @since  1.6
+     */
+    protected $default_view = 'apis';
 
-	/**
-	 * Constructor.
-	 *
-	 * @param   array                $config   An optional associative array of configuration settings.
-	 * Recognized key values include 'name', 'default_task', 'model_path', and
-	 * 'view_path' (this list is not meant to be comprehensive).
-	 * @param   MVCFactoryInterface  $factory  The factory.
-	 * @param   CMSApplication       $app      The JApplication for the dispatcher
-	 * @param   \JInput              $input    Input
-	 *
-	 * @since   1.0.0
-	 */
-	public function __construct($config = [], MVCFactoryInterface $factory = null, $app = null, $input = null)
-	{
-		parent::__construct($config, $factory, $app, $input);
-	}
+    /**
+     * Constructor.
+     *
+     * @param   array                 $config   Optional config.
+     * @param   MVCFactoryInterface   $factory  Factory.
+     * @param   mixed                 $app      App.
+     * @param   mixed                 $input    Input.
+     */
+    public function __construct($config = [], MVCFactoryInterface $factory = null, $app = null, $input = null)
+    {
+        parent::__construct($config, $factory, $app, $input);
+    }
 
-	/**
-	 * Method to display a view.
-	 *
-	 * @param   boolean  $cachable   If true, the view output will be cached
-	 * @param   array    $urlparams  An array of safe URL parameters and their variable types, for valid values see {@link \JFilterInput::clean()}.
-	 *
-	 * @return  static  This object to support chaining.
-	 *
-	 * @since   1.0.0
-	 */
-	public function display($cachable = false, $urlparams = [])
-	{
-        $safeurlparams = array(
+    /**
+     * Method to display a view.
+     *
+     * @param   boolean  $cachable   Cacheable
+     * @param   array    $urlparams  Safe URL params
+     *
+     * @return  static
+     */
+    public function display($cachable = false, $urlparams = [])
+    {
+        $safeurlparams = [
             'catid' => 'INT',
             'id' => 'INT',
             'cid' => 'ARRAY',
-			'limit' => 'UINT',
+            'limit' => 'UINT',
             'limitstart' => 'UINT',
             'return' => 'BASE64',
             'filter' => 'STRING',
-			'filter_order' => 'CMD',
+            'filter_order' => 'CMD',
             'filter_order_Dir' => 'CMD',
-            'filter-search' => 'STRING'
-            );
+            'filter-search' => 'STRING',
+            'index' => 'INT',
+            'itemId' => 'STRING',
+        ];
 
-		parent::display($cachable, $safeurlparams);
+        parent::display($cachable, $safeurlparams);
 
-		if (Factory::getApplication()->getIdentity()->get('id')) {
-			$cachable = false;
-		}
+        if (Factory::getApplication()->getIdentity()->get('id')) {
+            $cachable = false;
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 }

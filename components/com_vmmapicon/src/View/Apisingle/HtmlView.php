@@ -1,10 +1,9 @@
 <?php
-namespace Villaester\Component\Vmmapicon\Site\View\Apiitem;
+namespace Villaester\Component\Vmmapicon\Site\View\Apisingle;
 
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
 class HtmlView extends BaseHtmlView
@@ -31,3 +30,4 @@ class HtmlView extends BaseHtmlView
         parent::display($tpl);
     }
 }
+

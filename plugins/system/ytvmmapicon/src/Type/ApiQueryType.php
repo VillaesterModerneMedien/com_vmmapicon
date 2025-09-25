@@ -20,91 +20,98 @@
 namespace Joomla\Plugin\System\Ytvmmapicon\Type;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route;
 use Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider;
-use Joomla\Plugin\System\Ytvmmapicon\Helper\FieldsHelper;
-use Villaester\Component\Vmmapicon\Site\Helper\RouteHelper;
 
 
 class ApiQueryType
 {
     public static function config()
     {
-		$apiOptions = self::getApiOptions();
+        $apiOptions = self::getApiOptions();
 
         return [
-
             'fields' => [
                 'api' => [
                     'type' => 'ApiType',
                     'args' => [
-	                    'id' => [
-		                    'type' => 'Int',
-	                    ],
+                        'id' => [ 'type' => 'String' ],
+                        'index' => [ 'type' => 'Int' ],
+                        'itemId' => [ 'type' => 'String' ],
                     ],
                     'metadata' => [
                         'label' => 'Api Response Single',
                         'group' => 'Apis',
-
                         'fields' => [
-	                        'id' => [
-		                        'label' => 'Api-ID',
-		                        'description' => 'Api auswählen',
-		                        'type' => 'select',
-		                        'options' => $apiOptions,
-		                        'reload' => true,
-		                        'refresh' => true,
-	                        ],
+                            'id' => [
+                                'label' => 'Api-ID',
+                                'description' => 'Api auswählen',
+                                'type' => 'select',
+                                'options' => $apiOptions,
+                                'reload' => true,
+                                'refresh' => true,
+                            ],
+                            'index' => [
+                                'label' => 'Index',
+                                'description' => 'Index innerhalb von data (0-basiert)',
+                                'type' => 'number',
+                            ],
+                            'itemId' => [
+                                'label' => 'Item-ID',
+                                'description' => 'Optional: Element per ID auswählen',
+                                'type' => 'text',
+                            ],
                         ],
                     ],
-                    'extensions' => [
-	                    'call' => [self::class, 'resolve'],
+                    'extensions' => [ 'call' => __CLASS__ . '::resolve' ],
+                ],
+                'apiBlog' => [
+                    'type' => ['listOf' => 'ApiType'],
+                    'args' => [
+                        'id' => [ 'type' => 'String' ],
+                        'limit' => [ 'type' => 'Int' ],
+                        'offset' => [ 'type' => 'Int' ],
                     ],
+                    'metadata' => [
+                        'label' => 'Api Response Blog',
+                        'group' => 'Apis',
+                        'fields' => [
+                            'id' => [
+                                'label' => 'Api-ID',
+                                'description' => 'Api auswählen',
+                                'type' => 'select',
+                                'options' => $apiOptions,
+                                'reload' => true,
+                                'refresh' => true,
+                            ],
+                            'limit' => [ 'label' => 'Limit', 'type' => 'number' ],
+                            'offset' => [ 'label' => 'Offset', 'type' => 'number' ],
+                        ],
+                    ],
+                    'extensions' => [ 'call' => __CLASS__ . '::resolve' ],
                 ],
             ]
         ];
     }
-    public static function getApiOptions()
-    {
-        $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-        $options = $model->getApis();
+	public static function getApiOptions()
+	{
+		$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
+		$options = $model->getApis();
 
-        // Normalize options for YOOtheme select: ensure 'value' and 'text' are strings
-        $normalized = [];
-        if (is_array($options)) {
-            foreach ($options as $opt) {
-                $value = null;
-                $text  = null;
-
-                if (is_array($opt)) {
-                    $value = $opt['value'] ?? ($opt['id'] ?? null);
-                    $text  = $opt['text']  ?? ($opt['title'] ?? ($opt['name'] ?? null));
-                } elseif (is_object($opt)) {
-                    $value = $opt->value ?? ($opt->id ?? null);
-                    $text  = $opt->text  ?? ($opt->title ?? ($opt->name ?? null));
-                } else {
-                    // Scalar fallback: use same as text and value
-                    $value = $opt;
-                    $text  = $opt;
-                }
-
-                if ($value === null || $text === null) {
-                    continue;
-                }
-
-                $normalized[] = [
-                    'value' => (string) $value,
-                    'text'  => (string) $text,
-                ];
-            }
-        }
-
-        return $normalized;
-    }
+		return $options;
+	}
 
 	public static function resolve($item, $args, $context, $info)
 	{
-		return ApiTypeProvider::get($args['id']);
+		$field = $info->fieldName ?? 'api';
+		$id = (string) ($args['id'] ?? '');
+		if ($field === 'apiBlog') {
+			$limit = isset($args['limit']) ? (int) $args['limit'] : null;
+			$offset = isset($args['offset']) ? (int) $args['offset'] : 0;
+			return \Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider::getList($id, $limit, $offset);
+		}
+		$index = isset($args['index']) ? (int) $args['index'] : 0;
+		$itemId = isset($args['itemId']) ? (string) $args['itemId'] : null;
+		return \Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider::getSingle($id, $index, $itemId);
 	}
 
 }

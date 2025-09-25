@@ -29,7 +29,7 @@ class ApiitemModel extends ItemModel
         $pk = $pk ?: (int) $this->getState('api.id');
         $db = $this->getDbo();
         $query = $db->getQuery(true)
-            ->select('a.id, a.title, a.api_url, a.api_method, a.api_params, a.api_mapping, a.published')
+            ->select('a.id, a.title, a.api_url, a.api_method, a.api_params, a.published')
             ->from('#__vmmapicon_apis AS a')
             ->where('a.id = :id')
             ->bind(':id', $pk, \Joomla\Database\ParameterType::INTEGER);
@@ -41,7 +41,7 @@ class ApiitemModel extends ItemModel
             throw new \Exception(Text::_('COM_VMMAPICON_ERROR_API_NOT_FOUND'), 404);
         }
 
-        // Keep config for later mapping
+        // Keep config for later usage
         $this->apiConfig = $api;
 
         $raw = ApiHelper::getApiResult($api);
@@ -83,57 +83,6 @@ class ApiitemModel extends ItemModel
         // Ensure config loaded
         $this->getItem();
         return $this->apiConfig;
-    }
-
-    /**
-     * Returns mapping entries from api_config->api_mapping
-     * Each entry has: json_path, yootheme_name, field_type, field_label
-     */
-    public function getMappingEntries(): array
-    {
-        $cfg = $this->getApiConfig();
-        if (!$cfg || empty($cfg->api_mapping)) {
-            return [];
-        }
-        $mapping = json_decode($cfg->api_mapping, true);
-        if (!is_array($mapping)) {
-            return [];
-        }
-        $entries = [];
-        foreach ($mapping as $entry) {
-            if (!is_array($entry)) { continue; }
-            $jsonPath = $entry['json_path'] ?? '';
-            $name = $entry['yootheme_name'] ?? '';
-            if ($name === '') { continue; }
-            $entries[] = [
-                'json_path' => $jsonPath,
-                'yootheme_name' => $name,
-                'field_type' => $entry['field_type'] ?? 'String',
-                'field_label' => $entry['field_label'] ?? $name,
-            ];
-        }
-        return $entries;
-    }
-
-    /**
-     * Build mapped key=>value array based on mapping entries and current item
-     */
-    public function getMappedItem(): array
-    {
-        $item = $this->getItem();
-        if ($item === null) {
-            return [];
-        }
-        $array = is_object($item) ? json_decode(json_encode($item), true) : $item;
-        if (!is_array($array)) {
-            return [];
-        }
-        $mapped = [];
-        foreach ($this->getMappingEntries() as $e) {
-            $val = $this->followPath($array, $e['json_path'] ?? '');
-            $mapped[$e['yootheme_name']] = $val;
-        }
-        return $mapped;
     }
 
     private function followPath($data, string $path)

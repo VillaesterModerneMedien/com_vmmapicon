@@ -6,7 +6,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>mh@villaester.de</authorEmail>
 	<authorUrl>https://villaester.de</authorUrl>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<description>COM_VMMAPICON_XML_DESCRIPTION</description>
     <namespace path="src">Villaester\Component\Vmmapicon</namespace>
 

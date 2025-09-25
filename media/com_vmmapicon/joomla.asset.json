@@ -6,14 +6,6 @@
   "license": "GPL-2.0-or-later",
   "assets": [
     {
-      "name": "com_vmmapicon.apimapping",
-      "type": "script",
-      "uri": "com_vmmapicon/js/apiMapping.js",
-      "attributes": {
-        "defer": true
-      }
-    },
-    {
       "name": "com_vmmapicon.admin-vmmapicon-modal",
       "type": "script",
       "uri": "com_vmmapicon/admin-vmmapicon-modal.js",
