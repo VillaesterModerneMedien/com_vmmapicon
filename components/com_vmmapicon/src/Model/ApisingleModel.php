@@ -15,32 +15,29 @@ class ApisingleModel extends ApiitemModel
     {
         parent::populateState();
         $app = Factory::getApplication();
-        $this->setState('item.itemId', $app->input->getString('itemId', ''));
+        $this->setState('item.articleId', $app->input->getString('articleId', ''));
         // Context für YOOtheme & Listener bereitstellen
         $this->setState('context', 'com_vmmapicon.apisingle');
     }
 
-    public function getItem($pk = null)
+    public function getItem($id = null)
     {
         // Wenn itemId gesetzt ist, wähle das entsprechende Element aus data[]
-        $itemId = (string) $this->getState('item.itemId');
-        if ($itemId === '') {
-            return parent::getItem($pk);
+        $articleId = (string) $this->getState('item.articleId');
+        $apiId = (int) $this->getState('api.id');
+
+		if ($articleId === '') {
+			$articleId = $id;
         }
 
-        // Lade API-Konfig
-        $pk = $pk ?: (int) $this->getState('api.id');
-        $db = $this->getDbo();
-        $query = $db->getQuery(true)
-            ->select('a.id, a.title, a.api_url, a.api_method, a.api_params, a.published')
-            ->from('#__vmmapicon_apis AS a')
-            ->where('a.id = :id')
-            ->bind(':id', $pk, \Joomla\Database\ParameterType::INTEGER);
-        $db->setQuery($query);
-        $api = $db->loadObject();
-        if (!$api || (int) $api->published !== 1) {
-            throw new \Exception(Text::_('COM_VMMAPICON_ERROR_API_NOT_FOUND'), 404);
-        }
+	    // Lade API-Konfiguration
+	   $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
+	   $api = $model->getItem($apiId);
+
+	   if (!$api) {
+		   return [];
+	   }
+
         $raw = ApiHelper::getApiResult($api);
         if (!$raw) { return null; }
         $decoded = json_decode($raw, true);
@@ -50,7 +47,7 @@ class ApisingleModel extends ApiitemModel
         $data = $decoded['data'] ?? [];
         if (!is_array($data)) { return null; }
         foreach ($data as $rec) {
-            if (isset($rec['id']) && (string) $rec['id'] === $itemId) {
+            if (isset($rec['id']) && (string) $rec['id'] === $articleId) {
                 return $rec;
             }
         }

@@ -36,7 +36,7 @@ class ApiQueryType
                     'args' => [
                         'id' => [ 'type' => 'String' ],
                         'index' => [ 'type' => 'Int' ],
-                        'itemId' => [ 'type' => 'String' ],
+                        'articleId' => [ 'type' => 'String' ],
                     ],
                     'metadata' => [
                         'label' => 'Api Response Single',
@@ -55,7 +55,7 @@ class ApiQueryType
                                 'description' => 'Index innerhalb von data (0-basiert)',
                                 'type' => 'number',
                             ],
-                            'itemId' => [
+                            'articleId' => [
                                 'label' => 'Item-ID',
                                 'description' => 'Optional: Element per ID auswählen',
                                 'type' => 'text',
@@ -103,18 +103,25 @@ class ApiQueryType
 
 	public static function resolve($item, $args, $context, $info)
 	{
+		$app = Factory::getApplication();
+		$input = $app->getInput();
 		$field = $info->fieldName ?? 'api';
-		$id = (string) ($args['id'] ?? '');
+		$id = isset($args['id']) ? (string) $args['id'] : $input->get('id');
+		$index = isset($args['index']) ? (int) $args['index'] : $input->get('index');
+		$articleId = isset($args['articleId']) ? (string) $args['articleId'] : $input->get('articleId');
 
 		if ($field === 'apiBlog' || $item['template'] == 'com_content.article') {
 			$limit = isset($args['limit']) ? (int) $args['limit'] : null;
 			$offset = isset($args['offset']) ? (int) $args['offset'] : 0;
-			return ApiTypeProvider::getList($id, $limit, $offset);
+			$result = ApiTypeProvider::getList($id, $limit, $offset);
+			return $result;
 		}
 
-		$index = isset($args['index']) ? (int) $args['index'] : 0;
-		$itemId = isset($args['itemId']) ? (string) $args['itemId'] : null;
-		return ApiTypeProvider::getSingle($id, $index, $itemId);
+		if($index === null) {
+			$index = 0;
+		}
+		$result = ApiTypeProvider::getSingle($id, $index, $articleId);
+		return $result[0];
 	}
 
 }

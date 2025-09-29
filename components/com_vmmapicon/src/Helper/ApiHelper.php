@@ -3,6 +3,7 @@ namespace Villaester\Component\Vmmapicon\Site\Helper;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\Utilities\ArrayHelper;
 
 class ApiHelper
@@ -44,17 +45,24 @@ class ApiHelper
 
     public static function getApiResult(object $apiConfig): string
     {
-        $url = $apiConfig->api_url ?? '';
-        $method = isset($apiConfig->api_method) ? strtoupper($apiConfig->api_method) : 'GET';
+		$app = Factory::getApplication();
+		$input = $app->getInput();
+        $view = $input->get('view');
+		$url = $apiConfig->api_url ?? '';
+		$method = isset($apiConfig->api_method) ? strtoupper($apiConfig->api_method) : 'GET';
         $params = self::formatParams($apiConfig->api_params ?? null);
 
-        if (!$url) {
+	    if (!$url) {
             return '';
         }
 
         if (!empty($params['url'])) {
             $url .= (str_contains($url, '?') ? '&' : '?') . $params['url'];
         }
+
+		if ($view === "apisingle"){
+			$url = $apiConfig->api_url . "/" . $input->get('articleId');
+		}
 
 	    $curl = curl_init();
         $opts = [

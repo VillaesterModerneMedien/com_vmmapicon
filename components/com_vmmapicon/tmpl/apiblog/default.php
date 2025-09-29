@@ -32,10 +32,24 @@ $params = ComponentHelper::getParams('com_vmmapicon');
 	<?php if (!empty($this->items)) : ?>
 		<div class="apis-container">
 			<?php foreach ($this->items as $item) : ?>
+				<?php
+					$apiId  = (int) ($this->state->get('api.id') ?? 0);
+					// Robust: handle arrays or objects from JSON
+					$articleId = '';
+					$title  = '';
+					if (is_array($item)) {
+						$articleId = (string) ($item['id'] ?? '');
+						$title  = (string) ($item['attributes']['title'] ?? $item['title'] ?? $articleId);
+					} else {
+						$articleId = (string) ($item->id ?? '');
+						$title  = (string) ($item->attributes->title ?? $item->title ?? $articleId);
+					}
+					$link = Route::_('index.php?option=com_vmmapicon&view=apisingle&id=' . $apiId . '&articleId=' . rawurlencode($articleId));
+				?>
 				<div class="api-item" itemscope itemtype="https://schema.org/WebAPI">
 					<h2 itemprop="name">
-						<a href="<?php echo Route::_('index.php?option=com_vmmapicon&view=apiitem&id=' . (int) $item->id . '&index=0'); ?>" itemprop="url">
-							<?php echo $this->escape($item->title); ?>
+						<a href="<?php echo $link; ?>" itemprop="url">
+							<?php echo $this->escape($title); ?>
 						</a>
 					</h2>
 
@@ -74,4 +88,3 @@ $params = ComponentHelper::getParams('com_vmmapicon');
 		</div>
 	<?php endif; ?>
 </div>
-

@@ -21,64 +21,108 @@
 
 namespace Villaester\Component\Vmmapicon\Site\Service;
 
+
 use Joomla\CMS\Application\SiteApplication;
-use Joomla\CMS\Categories\CategoryFactoryInterface;
-use Joomla\CMS\Categories\CategoryInterface;
-use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Component\Router\RouterBase;
 use Joomla\CMS\Component\Router\RouterView;
 use Joomla\CMS\Component\Router\RouterViewConfiguration;
 use Joomla\CMS\Component\Router\Rules\MenuRules;
 use Joomla\CMS\Component\Router\Rules\NomenuRules;
-use Joomla\CMS\Component\Router\Rules\PreprocessRules;
 use Joomla\CMS\Component\Router\Rules\StandardRules;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Menu\AbstractMenu;
-use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 
-// phpcs:disable PSR1.Files.SideEffects
-\defined('_JEXEC') or die;
-// phpcs:enable PSR1.Files.SideEffects
-
 /**
- * Routing class of com_content
+ * Routing class from com_banners
  *
  * @since  3.3
  */
+
 class Router extends RouterView
 {
-    /**
-     * Flag to remove IDs
-     *
-     * @var    boolean
-     */
-    protected $noIDs = false;
 
-    /**
-     * The category factory
-     *
-     * @var CategoryFactoryInterface
-     *
-     * @since  4.0.0
-     */
-    private $categoryFactory;
+	public function __construct(SiteApplication $app, AbstractMenu $menu)
+	{
+		$views = ['apiblog', 'apisingle'];
 
-    /**
-     * The category cache
-     *
-     * @var  array
-     *
-     * @since  4.0.0
-     */
-    private $categoryCache = [];
+		foreach($views as $view)
+		{
+			$route = new RouterViewConfiguration($view);
+			$this->registerView($route);
+		}
 
-    /**
-     * The db
-     *
-     * @var DatabaseInterface
-     *
-     * @since  4.0.0
-     */
-    private $db;
+		parent::__construct($app, $menu);
 
+		$this->attachRule(new MenuRules($this));
+		$this->attachRule(new StandardRules($this));
+		$this->attachRule(new NomenuRules($this));
+	}
+
+
+	/**
+	 * Build the route for the com_banners component
+	 *
+	 * @param   array  $query  An array of URL arguments
+	 *
+	 * @return  array  The URL arguments to use to assemble the subsequent URL.
+	 *
+	 * @since   3.3
+	 */
+	public function build(&$query)
+	{
+		$segments = array();
+
+		if (isset($query['view']) && ($query['view'] === 'apiblog'))
+		{
+			$segments[] = ' ';
+			unset($query['view']);
+		}
+		if (isset($query['view']) && ($query['view'] === 'apisingle'))
+		{
+			//https://vmmapicon.joomla.local:8482/apitest/der-rothschoenberger-stolln
+			$segments[] = ' ';
+			$segments[] = $query['alias'];
+
+			unset($query['articleId']);
+			unset($query['view']);
+			unset($query['alias']);
+			unset($query['id']);
+			unset($query['Itemid']);
+
+		}
+
+		if (isset($query['id']))
+		{
+			unset($query['id']);
+		}
+
+		return $segments;
+	}
+
+	/**
+	 * Parse method for URLs
+	 * This method is meant to transform the human readable URL back into
+	 * query parameters. It is only executed when SEF mode is switched on.
+	 *
+	 * @param   array  &$segments  The segments of the URL to parse.
+	 *
+	 * @return  array  The URL attributes to be used by the application.
+	 *
+	 * @since   3.3
+	 */
+	public function parse(&$segments)
+	{
+		$vars = array();
+
+		if(count($segments) === 1){
+			$vars['view'] = 'apisingle';
+		}
+		$segments = [];
+
+		return $vars;
+	}
 
 }
+

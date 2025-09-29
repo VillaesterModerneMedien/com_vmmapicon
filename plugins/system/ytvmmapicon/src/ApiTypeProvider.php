@@ -24,39 +24,22 @@ public static function getSingle($id, int $index = 0, ?string $itemId = null)
 		$app = Factory::getApplication();
 		$input = $app->input;
         $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-        $item = $model->getItem($id);
-        if (!$item) {
+        $api = $model->getItem($id);
+        if (!$api) {
             return null;
         }
-		$itemId = $input->get('itemId');
+		$articleId = $input->get('articleId');
 
 		$apiSingleModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiSingle', 'Site');
-        $apiResponse = ApiHelper::getApiResult($item, true, $itemId);
-        $decoded = json_decode((string) $apiResponse, true);
-        if (!is_array($decoded)) {
-            return null;
-        }
-        $data = $decoded['data'] ?? [];
-        if (!is_array($data)) {
-            return null;
-        }
+        $apiResponse = $apiSingleModel->getItem($articleId);
 
-        $record = null;
-        if ($itemId !== null && $itemId !== '') {
-            foreach ($data as $rec) {
-                if (isset($rec['id']) && (string) $rec['id'] === (string) $itemId) {
-                    $record = $rec;
-                    break;
-                }
-            }
-        }
-        if ($record === null) {
-            $record = $data[$index] ?? null;
-        }
-        if ($record === null) {
-            return null;
-        }
-        return self::flattenRecord($record, (string) ($item->api_url ?? ''));
+	    $baseUrl = $api->api_url;
+	    $out = [];
+
+		$out[] = self::flattenRecord($apiResponse, $baseUrl);
+
+	    return $out;
+
     }
 
     public static function getList($id, ?int $limit = null, int $offset = 0): array
@@ -69,21 +52,6 @@ public static function getSingle($id, int $index = 0, ?string $itemId = null)
 		$apiBlogModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiBlog', 'Site');
 	    $items = $apiBlogModel->getItems($api->id, $limit, $offset);
 
-
-       /* $apiResponse = $items;
-        $decoded = json_decode((string) $apiResponse, true);
-        if (!is_array($decoded)) {
-            return [];
-        }
-        $data = $decoded['data'] ?? [];
-        if (!is_array($data)) {
-            return [];
-        }
-        $slice = array_slice($data, max(0, $offset), $limit ?? null);
-        $links = $decoded['links'] ?? [];
-        $out = [];
-        $baseUrl = (string) ($item->api_url ?? '');
-       */
 		$baseUrl = $api->api_url;
 	    $out = [];
 
@@ -152,10 +120,17 @@ public static function getSingle($id, int $index = 0, ?string $itemId = null)
 
     private static function flattenRecord(array $rec, ?string $baseUrl = null)
     {
-        $attributes = $rec['attributes'] ?? [];
+		$view = Factory::getApplication()->input->get('view');
+		if($view === 'apisingle') {
+			$attributes = $rec;
+		} else {
+			$attributes = $rec['attributes'] ?? [];
+			$relationships = $rec['relationships'] ?? [];
+		}
+
         $images = $attributes['images'] ?? [];
         $metadata = $attributes['metadata'] ?? [];
-        $relationships = $rec['relationships'] ?? [];
+
 
         $category = $relationships['category']['data']['id'] ?? null;
         $author = $relationships['created_by']['data']['id'] ?? null;
@@ -212,8 +187,8 @@ public static function getSingle($id, int $index = 0, ?string $itemId = null)
             'testfeld' => (string) ($attributes['testfeld'] ?? ''),
             'bilder' => $bilderList,
             'article_field' => isset($attributes['article-field']) ? (string) $attributes['article-field'] : '',
-
-            // Relationships
+			'self_link' => isset($attributes['self_link']) ? (string) $attributes['self_link'] : '',
+	        // Relationships
             'category_id' => $category ? (string) $category : null,
             'author_id' => $author ? (string) $author : null,
             'tags_ids' => $tagIds,

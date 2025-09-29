@@ -34,7 +34,7 @@ $params = ComponentHelper::getParams('com_vmmapicon');
             <?php foreach ($this->items as $item) : ?>
                 <div class="api-item" itemscope itemtype="https://schema.org/WebAPI">
                     <h2 itemprop="name">
-                        <a href="<?php echo Route::_('index.php?option=com_vmmapicon&view=apiitem&id=' . (int) $item->id . '&index=0'); ?>" itemprop="url">
+                        <a href="<?php echo Route::_('index.php?option=com_vmmapicon&view=apiblog&id=' . (int) $item->id); ?>" itemprop="url">
                             <?php echo $this->escape($item->title); ?>
                         </a>
                     </h2>
@@ -74,4 +74,3 @@ $params = ComponentHelper::getParams('com_vmmapicon');
         </div>
     <?php endif; ?>
 </div>
-

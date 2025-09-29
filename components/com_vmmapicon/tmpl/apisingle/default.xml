@@ -18,7 +18,7 @@
                    type="number"
                    label="COM_VMMAPICON_APIITEM_INDEX_LABEL"
                    default="0" />
-            <field name="itemId"
+            <field name="articleId"
                    type="text"
                    label="COM_VMMAPICON_APIITEM_ITEMID_LABEL"
                    description="COM_VMMAPICON_APIITEM_ITEMID_DESC" />

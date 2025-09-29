@@ -31,6 +31,7 @@ class ApiblogModel extends ListModel
 	    $this->setState('api.id', $id);
         $this->setState('params', $app->getParams());
         $this->setState('context', 'com_vmmapicon.apiblog');
+        $this->setState('Itemid', $active->id);
 
 		$pageSize = $paramsMenu->get('pagesize', 10);
 	    $this->setState('list.limit', $pageSize);
@@ -50,6 +51,7 @@ class ApiblogModel extends ListModel
 
     public function getItems($api = null, $limit = null, $start = null)
     {
+		$Itemid = $this->getState('Itemid');
         $id = (int) $this->getState('api.id');
         if (!$id && $api === null) {
             return [];
@@ -80,6 +82,11 @@ class ApiblogModel extends ListModel
             return [];
         }
 
+		$itemIndex = 0;
+		foreach ($decoded['data'] as $item) {
+			$decoded['data'][$itemIndex]['attributes']['self_link'] = "index.php?option=com_vmmapicon&view=apisingle&id=" . $id . "&articleId=" . $item['id'] . '&alias=' . $item['attributes']['alias'] . '&Itemid=' . $Itemid;
+		$itemIndex++;
+		}
         $list = $decoded['data'] ?? [];
         if (!is_array($list)) { return []; }
 
@@ -92,8 +99,8 @@ class ApiblogModel extends ListModel
 
 		$items  = array_slice($list, $start, $limit);
 	    return $items;
-
     }
+
 	public function getTotal(): int
 	{
 		$total = (int) $this->getState('list.total', 0);
