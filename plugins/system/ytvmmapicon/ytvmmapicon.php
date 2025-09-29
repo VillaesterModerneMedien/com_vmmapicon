@@ -29,22 +29,20 @@ defined('_JEXEC') or die;
 */
 class plgSystemYtvmmapicon extends CMSPlugin
 {
-    /**
-     * onAfterInitialise.
-     *
-     * @return  void
-     *
-     * @since   1.0.0
-     */
-    public function onAfterInitialise ()
-    {
-	    // Check if YOOtheme Pro is loaded
-	    if (!class_exists(Application::class, false)) {
-		    return;
-	    }
-        // Load a single module from the same directory
-        $app = Application::getInstance();
-        $app->load(__DIR__ . '/bootstrap.php');
-    }
+    /** @var bool */
+    protected $bootstrapped = false;
+
+	public function onAfterInitialise ()
+	{
+		// Check if YOOtheme Pro is loaded
+		if (!class_exists(Application::class, false)) {
+			return;
+		}
+
+
+		// Load a single module from the same directory
+		$app = Application::getInstance();
+		$app->load(__DIR__ . '/bootstrap.php');
+	}
 
 }

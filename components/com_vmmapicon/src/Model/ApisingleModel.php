@@ -16,6 +16,8 @@ class ApisingleModel extends ApiitemModel
         parent::populateState();
         $app = Factory::getApplication();
         $this->setState('item.itemId', $app->input->getString('itemId', ''));
+        // Context für YOOtheme & Listener bereitstellen
+        $this->setState('context', 'com_vmmapicon.apisingle');
     }
 
     public function getItem($pk = null)

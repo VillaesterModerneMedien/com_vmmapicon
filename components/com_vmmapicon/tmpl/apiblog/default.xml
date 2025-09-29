@@ -21,6 +21,20 @@
 		<fieldset name="basic" label="COM_VMMAPICON_ATTRIBS_API_SETTINGS_LABEL">
 			<field name="page_title" type="text" label="JGLOBAL_TITLE" />
 		</fieldset>
+		<fieldset name="advanced" label="JGLOBAL_LIST_LAYOUT_OPTIONS">
+
+			<field
+					name="pagesize"
+					type="text"
+					label="COM_VMMAPICON_APIBLOG_PAGESIZE_MENU_LABEL"
+					default="5"
+					filter="INT"
+					required="true"
+			>
+			</field>
+
+		</fieldset>
+
 	</fields>
 </metadata>
 

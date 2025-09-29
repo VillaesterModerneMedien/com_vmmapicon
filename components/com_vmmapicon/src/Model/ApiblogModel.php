@@ -8,6 +8,8 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Language\Text;
 use Joomla\Registry\Registry;
 use Villaester\Component\Vmmapicon\Site\Helper\ApiHelper;
+use Joomla\CMS\Pagination\Pagination;
+
 
 class ApiblogModel extends ListModel
 {
@@ -15,32 +17,101 @@ class ApiblogModel extends ListModel
 
     protected function populateState($ordering = null, $direction = null)
     {
+	    parent::populateState($ordering, $direction);
+
         $app = Factory::getApplication();
+
         $id = $app->input->getInt('id');
-        $this->setState('api.id', $id);
+
+	    $menu = $app->getMenu();
+	    $active = $menu->getActive();
+	    $paramsMenu = $active->getParams();
+
+
+	    $this->setState('api.id', $id);
         $this->setState('params', $app->getParams());
+        $this->setState('context', 'com_vmmapicon.apiblog');
+
+		$pageSize = $paramsMenu->get('pagesize', 10);
+	    $this->setState('list.limit', $pageSize);
+
+	    $start = $app->input->getInt('limitstart', null);
+	    if ($start === null) {
+		    $start = $app->input->getInt('start', null);
+	    }
+	    if ($start === null) {
+		    $page  = max(1, $app->input->getInt('page', 1));
+		    $start = ($page - 1) * $pageSize;
+	    }
+	    $this->setState('list.start', max(0, (int) $start));
+
+
     }
 
-    public function getItems()
+    public function getItems($api = null, $limit = null, $start = null)
     {
         $id = (int) $this->getState('api.id');
-        if (!$id) {
+        if (!$id && $api === null) {
             return [];
         }
-        // Lade API-Konfiguration
+		if($api !== null) {
+			$id = $api;
+		}
+
+		if(!$start){
+	        $start = (int) $this->getState('list.start');
+		}
+		if(!$limit){
+	        $limit = (int) $this->getState('list.limit');
+		}
+
+	    // Lade API-Konfiguration
         $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
         $cfg = $model->getItem($id);
         if (!$cfg) {
             return [];
         }
+
         $raw = ApiHelper::getApiResult($cfg);
-        if (!$raw) { return []; }
+	    if (!$raw) { return []; }
+
         $decoded = json_decode($raw, true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
             return [];
         }
+
         $list = $decoded['data'] ?? [];
         if (!is_array($list)) { return []; }
-        return $list;
+
+	    $total = count($list);
+	    $this->setState('list.total', $total);
+
+	    if ($limit === 0) {
+		    return $list;
+	    }
+
+		$items  = array_slice($list, $start, $limit);
+	    return $items;
+
     }
+	public function getTotal(): int
+	{
+		$total = (int) $this->getState('list.total', 0);
+		if ($total === 0) {
+			$total = count($this->getItems());
+			$this->setState('list.total', $total);
+		}
+
+		return $total;
+	}
+	public function getPagination(): Pagination
+	{
+		return new Pagination(
+			$this->getTotal(),
+			(int) $this->getState('list.start', 0),
+			(int) $this->getState('list.limit', 0)
+		);
+	}
+
+
 }

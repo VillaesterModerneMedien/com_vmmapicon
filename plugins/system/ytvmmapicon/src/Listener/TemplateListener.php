@@ -21,6 +21,8 @@ namespace Joomla\Plugin\System\Ytvmmapicon\Listener;
 
 use Joomla\CMS\Document\Document;
 use Joomla\CMS\Language\Text;
+use YOOtheme\Config;
+
 
 class TemplateListener
 {
@@ -31,53 +33,77 @@ class TemplateListener
     {
         $this->language = $document->language ?? 'de-de';
     }
-    public static function matchTemplate($view, $tpl)
+
+	public static function initCustomizer( $config)
+	{
+		$config->merge([
+			'templates' => [
+				'com_vmmapicon.apisingle' => [
+					'label' => 'Api Singleview Template',
+					'fieldset' => [
+						'default' => [
+							'fields' => [
+
+							],
+						],
+					],
+				],
+
+				'com_vmmapicon.apiblog' => [
+					'label' => 'Api Blog Template',
+					'fieldset' => [
+						'default' => [
+							'fields' => [
+
+							],
+						],
+					],
+
+				],
+			],
+
+		]);
+	}
+
+
+	public static function matchTemplate($view, $tpl)
     {
         if ($tpl) {
             return null;
         }
 
-        $layout = method_exists($view, 'getLayout') ? $view->getLayout() : null;
-        $viewName = method_exists($view, 'getName') ? $view->getName() : null;
-        $viewName = $viewName ? strtolower($viewName) : null;
+	    $layout = $view->getLayout();
+	    $context = $view->get('context');
 
-        // Standard-Layouts matchen
+
+        // Nur Standard-Layouts matchen
         if ($layout && $layout !== 'default') {
             return null;
         }
 
-        // Api-Single (Element per itemId)
-        if ($viewName === 'apisingle') {
+        // Kontext-basierte Matches (empfohlen)
+        if ($context === 'com_vmmapicon.apisingle' && $layout === 'default' && !$tpl) {
+            // Debug
+            @error_log('[ytvmmapicon] matchTemplate: matched com_vmmapicon.apisingle');
             return [
-                'type' => 'com_vmmapicon.apisingle',
+                'type' => $context,
                 'params' => ['item' => $view->get('item')],
             ];
         }
 
-        // Api-Blog (Liste)
-        if ($viewName === 'apiblog') {
+	    if ($context === 'com_vmmapicon.apiblog' && $layout === 'default' && !$tpl) {
+            // Debug
+            @error_log('[ytvmmapicon] matchTemplate: matched com_vmmapicon.apiblog');
             return [
-                'type' => 'com_vmmapicon.apiblog',
-                'params' => ['items' => $view->get('items')],
+                'type' => $context,
+                'params' => [
+                    'items' => $view->get('items'),
+                    'pagination' => $view->get('pagination'),
+                ],
             ];
         }
 
         return null;
     }
 
-    public static function registerTemplates(array $templates): array
-    {
-        // Registriere die beiden Template-Typen für den Builder-Dialog
-        $templates['com_vmmapicon.apiblog'] = [
-            'label' => Text::_('COM_VMMAPICON_APIBLOG_VIEW_DEFAULT_TITLE'),
-            'group' => 'VMMapicon',
-            'icon'  => 'database',
-        ];
-        $templates['com_vmmapicon.apisingle'] = [
-            'label' => Text::_('COM_VMMAPICON_APISINGLE_VIEW_DEFAULT_TITLE'),
-            'group' => 'VMMapicon',
-            'icon'  => 'file-text',
-        ];
-        return $templates;
-    }
 }

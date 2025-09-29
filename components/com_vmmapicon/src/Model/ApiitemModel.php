@@ -22,6 +22,8 @@ class ApiitemModel extends ItemModel
         $this->setState('item.index', $app->input->getInt('index', 0));
         $this->setState('item.path', $app->input->getString('path', ''));
         $this->setState('params', $app->getParams());
+        // Context für YOOtheme & Listener bereitstellen
+        $this->setState('context', 'com_vmmapicon.apiitem');
     }
 
     public function getItem($pk = null)

@@ -131,17 +131,44 @@ class ApisModel extends ListModel
      */
     protected function populateState($ordering = 'a.title', $direction = 'ASC')
     {
+        parent::populateState($ordering, $direction);
+
         $app = Factory::getApplication();
 
-        // Load the filter state.
-        $search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
-        $this->setState('filter.search', $search);
+	    // Hole den aktuellen Menüpunkt und dessen Parameter
+	    $menu = $app->getMenu();
+	    $active = $menu->getActive(); // Dies holt den aktuellen Menüpunkt
+	    $paramsMenu = $active->getParams();
 
-        // Load the parameters.
-        $params = $app->getParams();
-        $this->setState('params', $params);
+	    $PageSize = $paramsMenu->get('realestate_pagesize', 10);
 
-        // List state information.
-        parent::populateState($ordering, $direction);
+	    $this->setState('list.limit', $PageSize);
+
+	    $value = $app->input->getUInt('start', 0);
+	    $this->setState('list.start', $value);
+
     }
+
+	/**
+	 * Get the pagination object.
+	 *
+	 * @return \Joomla\CMS\Pagination\Pagination A pagination object.
+	 * @since  1.0.0
+	 */
+	public function getPagination()
+	{
+		// Check if the pagination object already exists.
+		if (empty($this->_pagination)) {
+			$start = (int) $this->getState('list.start');
+			$limit = (int) $this->getState('list.limit');
+
+			// Import the Joomla pagination library.
+			jimport('joomla.html.pagination');
+			// Create a new pagination object.
+			$this->_pagination = new \Joomla\CMS\Pagination\Pagination($this->getTotal(), $start, $limit);
+		}
+		return $this->_pagination;
+	}
+
+
 }

@@ -87,15 +87,17 @@ use Joomla\Utilities\ArrayHelper;
 	     *
 	     * @return  string  A result string from API-call
 	     */
-	    public static function getApiResult($apiConfig)
+	    public static function getApiResult($apiConfig, $isSingle = false, $articleId = null)
 	    {
 		    $apiParams = self::_formatParams($apiConfig->{'api_params'});
 
 			if(!empty($apiConfig->{'api_url'})){
 			$url = $apiConfig->{'api_url'};
-			if(!empty($apiParams['url']))
+			if(!empty($apiParams['url']) && !$isSingle)
 			{
 				$url .= '?' . $apiParams['url'];
+			} else{
+				$url .= '/' . $articleId;
 			}
 				$curl = curl_init();
 

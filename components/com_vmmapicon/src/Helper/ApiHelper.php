@@ -56,7 +56,7 @@ class ApiHelper
             $url .= (str_contains($url, '?') ? '&' : '?') . $params['url'];
         }
 
-        $curl = curl_init();
+	    $curl = curl_init();
         $opts = [
             CURLOPT_URL            => $url,
             CURLOPT_RETURNTRANSFER => true,

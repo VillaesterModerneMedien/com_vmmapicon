@@ -11,17 +11,18 @@ class HtmlView extends BaseHtmlView
 {
     protected $items;
     protected $state;
-    protected $params;
+    protected $params = null;
+	protected $pagination;
+
+
+	protected $context = 'com_vmmapicon.apiblog';
 
     public function display($tpl = null): void
     {
         $this->items      = $this->get('Items');
         $this->state      = $this->get('State');
         $this->params     = $this->state->get('params');
-
-        if (count($errors = $this->get('Errors'))) {
-            throw new \Exception(implode("\n", $errors), 500);
-        }
+	    $this->pagination = $this->get('Pagination');
 
         parent::display($tpl);
     }

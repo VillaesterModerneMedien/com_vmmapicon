@@ -2,7 +2,9 @@
 
 namespace Joomla\Plugin\System\Ytvmmapicon;
 use Joomla\CMS\Factory;
+use Joomla\Utilities\ArrayHelper;
 use Villaester\Component\Vmmapicon\Administrator\Helper\ApiHelper;
+use function YOOtheme\app;
 
 
 /**
@@ -16,14 +18,20 @@ class ApiTypeProvider
         return self::getSingle($id, 0, null);
     }
 
-    public static function getSingle($id, int $index = 0, ?string $itemId = null)
+
+public static function getSingle($id, int $index = 0, ?string $itemId = null)
     {
+		$app = Factory::getApplication();
+		$input = $app->input;
         $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
         $item = $model->getItem($id);
         if (!$item) {
             return null;
         }
-        $apiResponse = ApiHelper::getApiResult($item);
+		$itemId = $input->get('itemId');
+
+		$apiSingleModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiSingle', 'Site');
+        $apiResponse = ApiHelper::getApiResult($item, true, $itemId);
         $decoded = json_decode((string) $apiResponse, true);
         if (!is_array($decoded)) {
             return null;
@@ -48,18 +56,21 @@ class ApiTypeProvider
         if ($record === null) {
             return null;
         }
-        $links = $decoded['links'] ?? [];
-        return self::flattenRecord($record, $links, (string) ($item->api_url ?? ''));
+        return self::flattenRecord($record, (string) ($item->api_url ?? ''));
     }
 
     public static function getList($id, ?int $limit = null, int $offset = 0): array
     {
         $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-        $item = $model->getItem($id);
-        if (!$item) {
+        $api = $model->getItem($id);
+        if (!$api) {
             return [];
         }
-        $apiResponse = ApiHelper::getApiResult($item);
+		$apiBlogModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiBlog', 'Site');
+	    $items = $apiBlogModel->getItems($api->id, $limit, $offset);
+
+
+       /* $apiResponse = $items;
         $decoded = json_decode((string) $apiResponse, true);
         if (!is_array($decoded)) {
             return [];
@@ -72,13 +83,18 @@ class ApiTypeProvider
         $links = $decoded['links'] ?? [];
         $out = [];
         $baseUrl = (string) ($item->api_url ?? '');
-        foreach ($slice as $rec) {
-            $out[] = self::flattenRecord($rec, $links, $baseUrl);
-        }
+       */
+		$baseUrl = $api->api_url;
+	    $out = [];
+
+		foreach ($items as $item) {
+			$out[] = self::flattenRecord($item, $baseUrl);
+		}
+
         return $out;
     }
 
-    private static function originFromUrl(?string $url): string
+	private static function originFromUrl(?string $url): string
     {
         if (!$url) { return ''; }
         $p = parse_url($url);
@@ -134,7 +150,7 @@ class ApiTypeProvider
         return $result;
     }
 
-    private static function flattenRecord(array $rec, array $rootLinks = [], ?string $baseUrl = null)
+    private static function flattenRecord(array $rec, ?string $baseUrl = null)
     {
         $attributes = $rec['attributes'] ?? [];
         $images = $attributes['images'] ?? [];
@@ -201,9 +217,6 @@ class ApiTypeProvider
             'category_id' => $category ? (string) $category : null,
             'author_id' => $author ? (string) $author : null,
             'tags_ids' => $tagIds,
-
-            // Links
-            'self_link' => (string) ($rootLinks['self'] ?? ''),
 
             // Raw
             'raw' => json_encode($rec, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),

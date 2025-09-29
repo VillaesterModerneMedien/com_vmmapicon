@@ -89,6 +89,7 @@ class ApiQueryType
                     ],
                     'extensions' => [ 'call' => __CLASS__ . '::resolve' ],
                 ],
+
             ]
         ];
     }
@@ -104,14 +105,16 @@ class ApiQueryType
 	{
 		$field = $info->fieldName ?? 'api';
 		$id = (string) ($args['id'] ?? '');
-		if ($field === 'apiBlog') {
+
+		if ($field === 'apiBlog' || $item['template'] == 'com_content.article') {
 			$limit = isset($args['limit']) ? (int) $args['limit'] : null;
 			$offset = isset($args['offset']) ? (int) $args['offset'] : 0;
-			return \Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider::getList($id, $limit, $offset);
+			return ApiTypeProvider::getList($id, $limit, $offset);
 		}
+
 		$index = isset($args['index']) ? (int) $args['index'] : 0;
 		$itemId = isset($args['itemId']) ? (string) $args['itemId'] : null;
-		return \Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider::getSingle($id, $index, $itemId);
+		return ApiTypeProvider::getSingle($id, $index, $itemId);
 	}
 
 }

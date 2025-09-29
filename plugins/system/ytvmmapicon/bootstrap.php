@@ -19,6 +19,9 @@
 
 use Joomla\Plugin\System\Ytvmmapicon\Listener\SourceListener;
 use Joomla\Plugin\System\Ytvmmapicon\Listener\TemplateListener;
+use YOOtheme\Builder;
+use YOOtheme\Builder\BuilderConfig;
+
 
 include_once __DIR__ . '/src/ApiTypeProvider.php';
 include_once __DIR__ . '/src/Type/ApiImage.php';
@@ -31,13 +34,12 @@ return [
         'source.init' => [
             SourceListener::class => 'initSource'
         ],
+        BuilderConfig::class => [
+			TemplateListener::class => 'initCustomizer'
+	    ],
         // Registriert Template-Matching für Joomla-Views
-        'view' => [
-            TemplateListener::class => 'matchTemplate'
-        ],
-        // Registriert Template-Typen in der YOOtheme Template-Übersicht
-        'builder.templates' => [
-            TemplateListener::class => 'registerTemplates'
+        'builder.template' => [
+            TemplateListener::class => '@matchTemplate'
         ],
     ],
 ];
