@@ -5,6 +5,7 @@ namespace Villaester\Component\Vmmapicon\Site\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\Database\DatabaseInterface;
 use Villaester\Component\Vmmapicon\Site\Helper\ApiHelper;
 
 class ApisingleModel extends ApiitemModel
@@ -16,11 +17,32 @@ class ApisingleModel extends ApiitemModel
         parent::populateState();
         $app = Factory::getApplication();
         $this->setState('item.articleId', $app->input->getString('articleId', ''));
+
         // Context für YOOtheme & Listener bereitstellen
         $this->setState('context', 'com_vmmapicon.apisingle');
     }
 
-    public function getItem($id = null)
+	public function getMapping($alias, $apiId){
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
+
+		if ($alias === null || $alias === '' || !(int)$apiId) {
+			return 0;
+		}
+
+		$query = $db->getQuery(true)
+			->select($db->quoteName('article_id'))
+			->from($db->quoteName('#__vmmapicon_mapping'))
+			->where($db->quoteName('alias') . ' = ' . $db->quote((string) $alias))
+			->where($db->quoteName('api_id') . ' = ' . (int) $apiId);
+
+		// Ersten Treffer holen
+		$db->setQuery($query, 0, 1);
+		$articleId = $db->loadResult();
+
+		return (int) $articleId;
+	}
+
+	public function getItem($id = null)
     {
         // Wenn itemId gesetzt ist, wähle das entsprechende Element aus data[]
         $articleId = (string) $this->getState('item.articleId');

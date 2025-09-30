@@ -19,7 +19,7 @@ class ApiTypeProvider
     }
 
 
-public static function getSingle($id, int $index = 0, ?string $itemId = null)
+public static function getSingle($id, int $index = 0, ?string $articleId = null)
     {
 		$app = Factory::getApplication();
 		$input = $app->input;
@@ -42,15 +42,16 @@ public static function getSingle($id, int $index = 0, ?string $itemId = null)
 
     }
 
-    public static function getList($id, ?int $limit = null, int $offset = 0): array
+    public static function getList($id, ?int $limit = null, int $offset = 0, String $template = null): array
     {
         $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
         $api = $model->getItem($id);
         if (!$api) {
             return [];
         }
+
 		$apiBlogModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiBlog', 'Site');
-	    $items = $apiBlogModel->getItems($api->id, $limit, $offset);
+	    $items = $apiBlogModel->getItems($api->id, $limit, $offset, $template);
 
 		$baseUrl = $api->api_url;
 	    $out = [];

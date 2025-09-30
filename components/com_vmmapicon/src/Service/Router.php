@@ -45,7 +45,7 @@ class Router extends RouterView
 
 	public function __construct(SiteApplication $app, AbstractMenu $menu)
 	{
-		$views = ['apiblog', 'apisingle'];
+		$views = ['apiblog', 'apisingle', 'article'];
 
 		foreach($views as $view)
 		{
@@ -73,7 +73,7 @@ class Router extends RouterView
 	public function build(&$query)
 	{
 		$segments = array();
-
+		$a = $query;
 		if (isset($query['view']) && ($query['view'] === 'apiblog'))
 		{
 			$segments[] = ' ';
@@ -81,8 +81,8 @@ class Router extends RouterView
 		}
 		if (isset($query['view']) && ($query['view'] === 'apisingle'))
 		{
-			//https://vmmapicon.joomla.local:8482/apitest/der-rothschoenberger-stolln
 			$segments[] = ' ';
+			$segments[] = $query['category'];
 			$segments[] = $query['alias'];
 
 			unset($query['articleId']);
@@ -90,10 +90,10 @@ class Router extends RouterView
 			unset($query['alias']);
 			unset($query['id']);
 			unset($query['Itemid']);
+			unset($query['category']);
 
 		}
-
-		if (isset($query['id']))
+			if (isset($query['id']))
 		{
 			unset($query['id']);
 		}
@@ -114,11 +114,19 @@ class Router extends RouterView
 	 */
 	public function parse(&$segments)
 	{
+		$menu = Factory::getApplication()->getMenu();
+		$active = $menu->getActive();
+		$itemParams = $active->query;
+		$apiId = $itemParams['id'];
+
+		$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiSingle', 'Site');
+
 		$vars = array();
 
-		if(count($segments) === 1){
+			$articleId = $model->getMapping($segments[1], $apiId);
 			$vars['view'] = 'apisingle';
-		}
+			$vars['articleId'] = $articleId;
+
 		$segments = [];
 
 		return $vars;

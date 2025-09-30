@@ -43,6 +43,36 @@ class ApiHelper
         return $params;
     }
 
+	public static function getCategoryNames(String $apiUrl, array $params): array{
+
+		$url = str_replace('/articles', '/categories', $apiUrl);
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL            => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING       => '',
+			CURLOPT_MAXREDIRS      => 10,
+			CURLOPT_TIMEOUT        => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST  => 'GET',
+			CURLOPT_HTTPHEADER     => $params,
+		));
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+		$responseArray = json_decode($response, true);
+		$categories = [];
+		foreach ($responseArray['data'] as $category){
+			$categories [$category['id']] = [$category['attributes']['title'], $category['attributes']['alias']];
+ ;
+		}
+		return  (array) $categories;
+
+	}
     public static function getApiResult(object $apiConfig): string
     {
 		$app = Factory::getApplication();
@@ -55,6 +85,8 @@ class ApiHelper
 	    if (!$url) {
             return '';
         }
+
+		$categories = self::getCategoryNames($url, $params['head']);
 
         if (!empty($params['url'])) {
             $url .= (str_contains($url, '?') ? '&' : '?') . $params['url'];
@@ -81,7 +113,27 @@ class ApiHelper
         }
         curl_setopt_array($curl, $opts);
         $response = curl_exec($curl);
-        curl_close($curl);
+
+	    $responseArray = json_decode($response, true);
+
+		$entries = count($responseArray['data']);
+		if($view === 'apisingle'){
+			$categoryName = $categories[$responseArray['data']['relationships']['category']['data']['id']][0];
+			$categoryAlias = $categories[$responseArray['data']['relationships']['category']['data']['id']][1];
+			$responseArray['data']['attributes']['categoryname'] = $categoryName;
+			$responseArray['data']['attributes']['categoryalias'] = $categoryAlias;
+
+		} else {
+			foreach ($responseArray['data'] as $key => $value){
+				$categoryName = $categories[$responseArray['data'][$key]['relationships']['category']['data']['id']][0];
+				$categoryAlias = $categories[$responseArray['data'][$key]['relationships']['category']['data']['id']][1];
+				$responseArray['data'][$key]['attributes']['categoryname'] = $categoryName;
+				$responseArray['data'][$key]['attributes']['categoryalias'] = $categoryAlias;
+			}
+		}
+
+		$response = json_encode($responseArray);
+	    curl_close($curl);
         return (string) $response;
     }
 }

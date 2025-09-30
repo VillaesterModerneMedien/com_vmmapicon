@@ -47,3 +47,10 @@ ALTER TABLE `#__vmmapicon_apis`
 ALTER TABLE `#__vmmapicon_apis`
     MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 COMMIT;
+
+
+CREATE TABLE `#__vmmapicon_mapping` (
+                                     `id` int(11) UNSIGNED NOT NULL,
+                                     `alias` varchar(255) NOT NULL,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

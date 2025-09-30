@@ -88,7 +88,7 @@ class Icon
 
 		$button = HTMLHelper::_('link', Route::_($url), $text, $attribs);
 
-		$output = '<span class="hasTooltip" title="' . HTMLHelper::_('tooltipText', 'COM_VMMAPICON_CREATE_REALESTATE') . '">' . $button . '</span>';
+		$output = '<span class="hasTooltip" title="' . HTMLHelper::_('tooltipText', 'COM_VMMAPICON_CREATE_API') . '">' . $button . '</span>';
 
 		return $output;
 	}
@@ -195,10 +195,10 @@ class Icon
 		}
 
 		$text = '<span class="hasTooltip fa fa-' . $icon . '" title="'
-			. HTMLHelper::tooltipText(Text::_('COM_VMMAPICON_EDIT_REALESTATE'), $overlib, 0, 0) . '"></span> ';
+			. HTMLHelper::tooltipText(Text::_('COM_VMMAPICON_EDIT_API'), $overlib, 0, 0) . '"></span> ';
 		$text .= Text::_('JGLOBAL_EDIT');
 
-		$attribs['title'] = Text::_('COM_VMMAPICON_EDIT_REALESTATE');
+		$attribs['title'] = Text::_('COM_VMMAPICON_EDIT_API');
 		$output           = HTMLHelper::_('link', Route::_($url), $text, $attribs);
 
 		return $output;

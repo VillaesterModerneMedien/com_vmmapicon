@@ -6,6 +6,7 @@ namespace Villaester\Component\Vmmapicon\Site\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Language\Text;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Registry\Registry;
 use Villaester\Component\Vmmapicon\Site\Helper\ApiHelper;
 use Joomla\CMS\Pagination\Pagination;
@@ -27,7 +28,6 @@ class ApiblogModel extends ListModel
 	    $active = $menu->getActive();
 	    $paramsMenu = $active->getParams();
 
-
 	    $this->setState('api.id', $id);
         $this->setState('params', $app->getParams());
         $this->setState('context', 'com_vmmapicon.apiblog');
@@ -46,10 +46,57 @@ class ApiblogModel extends ListModel
 	    }
 	    $this->setState('list.start', max(0, (int) $start));
 
-
     }
 
-    public function getItems($api = null, $limit = null, $start = null)
+	private function _setMappings($idMapping){
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$apiId = (int) $this->getState('api.id');
+
+		if (empty($idMapping) || !$apiId) {
+			return;
+		}
+
+		try {
+			$db->transactionStart();
+
+			$query = $db->getQuery(true)
+				->delete($db->quoteName('#__vmmapicon_mapping'))
+				->where($db->quoteName('api_id') . ' = ' . $apiId);
+			$db->setQuery($query)->execute();
+
+			$table   = $db->quoteName('#__vmmapicon_mapping');
+			$columns = [
+				$db->quoteName('api_id'),
+				$db->quoteName('article_id'),
+				$db->quoteName('alias'),
+			];
+
+			$rows = [];
+			foreach ($idMapping as $articleId => $alias) {
+				$rows[] = $apiId . ', ' . (int) $articleId . ', ' . $db->quote((string) $alias);
+			}
+
+			$chunkSize = 500;
+			foreach (array_chunk($rows, $chunkSize) as $chunk) {
+				$query = $db->getQuery(true)
+					->insert($table)
+					->columns($columns);
+				foreach ($chunk as $row) {
+					$query->values($row);
+				}
+				$db->setQuery($query)->execute();
+			}
+
+			$db->transactionCommit();
+		} catch (\Throwable $e) {
+			$db->transactionRollback();
+			throw $e;
+		}
+	}
+
+
+
+    public function getItems($api = null, $limit = null, $start = null, String $template = null)
     {
 		$Itemid = $this->getState('Itemid');
         $id = (int) $this->getState('api.id');
@@ -83,8 +130,12 @@ class ApiblogModel extends ListModel
         }
 
 		$itemIndex = 0;
+		$idMapping = [];
+
 		foreach ($decoded['data'] as $item) {
-			$decoded['data'][$itemIndex]['attributes']['self_link'] = "index.php?option=com_vmmapicon&view=apisingle&id=" . $id . "&articleId=" . $item['id'] . '&alias=' . $item['attributes']['alias'] . '&Itemid=' . $Itemid;
+			$categoryAlias = $decoded['data'][$itemIndex]['attributes']['categoryalias'];
+			$decoded['data'][$itemIndex]['attributes']['self_link'] = "index.php?option=com_vmmapicon&view=apisingle&id=" . $id . "&articleId=" . $item['id'] . '&alias=' . $item['attributes']['alias'] . '&Itemid=' . $Itemid . '&category=' . $categoryAlias;
+			$idMapping[$item['id']] = $item['attributes']['alias'];
 		$itemIndex++;
 		}
         $list = $decoded['data'] ?? [];
@@ -98,6 +149,7 @@ class ApiblogModel extends ListModel
 	    }
 
 		$items  = array_slice($list, $start, $limit);
+		$this->_setMappings($idMapping);
 	    return $items;
     }
 

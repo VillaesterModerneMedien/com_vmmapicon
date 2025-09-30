@@ -31,7 +31,7 @@ class ApiQueryType
 
         return [
             'fields' => [
-                'api' => [
+	            'api' => [
                     'type' => 'ApiType',
                     'args' => [
                         'id' => [ 'type' => 'String' ],
@@ -110,10 +110,10 @@ class ApiQueryType
 		$index = isset($args['index']) ? (int) $args['index'] : $input->get('index');
 		$articleId = isset($args['articleId']) ? (string) $args['articleId'] : $input->get('articleId');
 
-		if ($field === 'apiBlog' || $item['template'] == 'com_content.article') {
+		if ($field === 'apiBlog') {
 			$limit = isset($args['limit']) ? (int) $args['limit'] : null;
 			$offset = isset($args['offset']) ? (int) $args['offset'] : 0;
-			$result = ApiTypeProvider::getList($id, $limit, $offset);
+			$result = ApiTypeProvider::getList($id, $limit, $offset, $item['template']);
 			return $result;
 		}
 
