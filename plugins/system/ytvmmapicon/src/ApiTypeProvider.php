@@ -30,7 +30,7 @@ public static function getSingle($id, int $index = 0, ?string $articleId = null)
         }
 		$articleId = $input->get('articleId');
 
-		$apiSingleModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiSingle', 'Site');
+		$apiSingleModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Apisingle', 'Site');
         $apiResponse = $apiSingleModel->getItem($articleId);
 
 	    $baseUrl = $api->api_url;
@@ -42,7 +42,7 @@ public static function getSingle($id, int $index = 0, ?string $articleId = null)
 
     }
 
-    public static function getList($id, ?int $limit = null, int $offset = 0, String $template = null): array
+    public static function getList($id, ?int $limit = null, int $offset = 0): array
     {
         $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
         $api = $model->getItem($id);
@@ -50,8 +50,8 @@ public static function getSingle($id, int $index = 0, ?string $articleId = null)
             return [];
         }
 
-		$apiBlogModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiBlog', 'Site');
-	    $items = $apiBlogModel->getItems($api->id, $limit, $offset, $template);
+		$apiBlogModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Apiblog', 'Site');
+	    $items = $apiBlogModel->getItems($api->id, $limit, $offset);
 
 		$baseUrl = $api->api_url;
 	    $out = [];
@@ -187,10 +187,13 @@ public static function getSingle($id, int $index = 0, ?string $articleId = null)
             'text' => (string) ($attributes['text'] ?? ''),
             'testfeld' => (string) ($attributes['testfeld'] ?? ''),
             'bilder' => $bilderList,
+	        'auszug' => (string) ($attributes['auszug'] ?? ''),
             'article_field' => isset($attributes['article-field']) ? (string) $attributes['article-field'] : '',
 			'self_link' => isset($attributes['self_link']) ? (string) $attributes['self_link'] : '',
 	        // Relationships
             'category_id' => $category ? (string) $category : null,
+            'category_name' => isset($attributes['categoryname']) ? (string) $attributes['categoryname'] : '',
+            'category_alias' => isset($attributes['categoryalias']) ? (string) $attributes['categoryalias'] : '',
             'author_id' => $author ? (string) $author : null,
             'tags_ids' => $tagIds,
 

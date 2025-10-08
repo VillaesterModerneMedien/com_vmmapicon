@@ -19,10 +19,11 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null): void
     {
-        $this->items      = $this->get('Items');
-        $this->state      = $this->get('State');
-        $this->params     = $this->state->get('params');
-	    $this->pagination = $this->get('Pagination');
+		$model              = $this->getModel();
+        $this->items        = $this->get('Items');
+        $this->state        = $this->get('State');
+        $this->params       = $this->state->get('params');
+	    $this->pagination   = $model->getPagination();
 
         parent::display($tpl);
     }

@@ -33,6 +33,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Menu\AbstractMenu;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
+use PHPSQLParser\Test\Parser\issue11Test;
 
 /**
  * Routing class from com_banners
@@ -72,30 +73,27 @@ class Router extends RouterView
 	 */
 	public function build(&$query)
 	{
-		$segments = array();
-		$a = $query;
-		if (isset($query['view']) && ($query['view'] === 'apiblog'))
-		{
-			$segments[] = ' ';
-			unset($query['view']);
-		}
-		if (isset($query['view']) && ($query['view'] === 'apisingle'))
-		{
-			$segments[] = ' ';
-			$segments[] = $query['category'];
-			$segments[] = $query['alias'];
+		$segments = [];
 
-			unset($query['articleId']);
-			unset($query['view']);
-			unset($query['alias']);
-			unset($query['id']);
-			unset($query['Itemid']);
-			unset($query['category']);
-
+		// Liste: vom Menü abgedeckt, keine Segmente erzeugen
+		if (isset($query['view']) && $query['view'] === 'apiblog') {
+			unset($query['view'], $query['id']);
+			return $segments;
 		}
-			if (isset($query['id']))
-		{
-			unset($query['id']);
+
+		// Einzelansicht (von 'article' oder direkt 'apisingle' kommend)
+		if (isset($query['view']) && ($query['view'] === 'apisingle')) {
+
+			// Segmente: /{category}/{alias}
+			if (!empty($query['category'])) {
+				$segments[] = $query['category'];
+			}
+			if (!empty($query['alias'])) {
+				$segments[] = $query['alias'];
+			}
+
+			// Überflüssige Parameter entfernen (SEF)
+			unset($query['Itemid'],$query['view'], $query['alias'], $query['category'], $query['articleId'], $query['id']);
 		}
 
 		return $segments;
@@ -114,16 +112,16 @@ class Router extends RouterView
 	 */
 	public function parse(&$segments)
 	{
-		$menu = Factory::getApplication()->getMenu();
+		/*$menu = Factory::getApplication()->getMenu();
 		$active = $menu->getActive();
 		$itemParams = $active->query;
-		$apiId = $itemParams['id'];
+		$apiId = $itemParams['id'];*/
 
-		$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('ApiSingle', 'Site');
+		$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Apisingle', 'Site');
 
 		$vars = array();
 
-			$articleId = $model->getMapping($segments[1], $apiId);
+			$articleId = $model->getMapping($segments[1], $segments[0]);
 			$vars['view'] = 'apisingle';
 			$vars['articleId'] = $articleId;
 
@@ -133,4 +131,3 @@ class Router extends RouterView
 	}
 
 }
-

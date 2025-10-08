@@ -46,7 +46,7 @@
                 name="api_method"
                 type="list"
                 label="API Method"
-                description="APIMethode auswählen"
+                description="API Methode auswählen"
                 default="">
             <option value="GET">GET</option>
             <option value="POST">POST</option>
@@ -70,7 +70,7 @@
         <field
                 name="api_params"
                 type="subform"
-                label="test"
+                label="Api Params"
                 multiple="true"
         >
             <form>

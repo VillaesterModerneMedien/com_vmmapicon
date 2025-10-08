@@ -30,7 +30,7 @@ class DisplayController extends BaseController
      * @param   mixed                 $app      App.
      * @param   mixed                 $input    Input.
      */
-    public function __construct($config = [], MVCFactoryInterface $factory = null, $app = null, $input = null)
+    public function __construct($config = [], ?MVCFactoryInterface $factory = null, $app = null, $input = null)
     {
         parent::__construct($config, $factory, $app, $input);
     }

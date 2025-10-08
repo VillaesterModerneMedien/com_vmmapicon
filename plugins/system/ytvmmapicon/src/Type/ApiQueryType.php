@@ -113,7 +113,7 @@ class ApiQueryType
 		if ($field === 'apiBlog') {
 			$limit = isset($args['limit']) ? (int) $args['limit'] : null;
 			$offset = isset($args['offset']) ? (int) $args['offset'] : 0;
-			$result = ApiTypeProvider::getList($id, $limit, $offset, $item['template']);
+			$result = ApiTypeProvider::getList($id, $limit, $offset);
 			return $result;
 		}
 

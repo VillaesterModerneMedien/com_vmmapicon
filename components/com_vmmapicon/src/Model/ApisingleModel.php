@@ -22,10 +22,10 @@ class ApisingleModel extends ApiitemModel
         $this->setState('context', 'com_vmmapicon.apisingle');
     }
 
-	public function getMapping($alias, $apiId){
+	public function getMapping($alias, $category){
 		$db = Factory::getContainer()->get(DatabaseInterface::class);
 
-		if ($alias === null || $alias === '' || !(int)$apiId) {
+		if ($alias === null || $alias === '' || !$category) {
 			return 0;
 		}
 
@@ -33,7 +33,7 @@ class ApisingleModel extends ApiitemModel
 			->select($db->quoteName('article_id'))
 			->from($db->quoteName('#__vmmapicon_mapping'))
 			->where($db->quoteName('alias') . ' = ' . $db->quote((string) $alias))
-			->where($db->quoteName('api_id') . ' = ' . (int) $apiId);
+			->where($db->quoteName('category') . ' = ' . $db->quote((string) $category));
 
 		// Ersten Treffer holen
 		$db->setQuery($query, 0, 1);

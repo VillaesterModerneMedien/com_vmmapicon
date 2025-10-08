@@ -127,7 +127,7 @@ class VmmapiconComponent extends MVCComponent implements
 	 *
 	 * @since   4.0.0
 	 */
-	protected function getTableNameForSection(string $section = null)
+	protected function getTableNameForSection(?string $section = null)
 	{
 		return ($section === 'category' ? 'categories' : 'vmmapicon_apis');
 	}
@@ -141,7 +141,7 @@ class VmmapiconComponent extends MVCComponent implements
 	 *
 	 * @since   4.0.0
 	 */
-	protected function getStateColumnForSection(string $section = null)
+	protected function getStateColumnForSection(?string $section = null)
 	{
 		return 'published';
 	}

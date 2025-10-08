@@ -48,55 +48,7 @@ class ApiblogModel extends ListModel
 
     }
 
-	private function _setMappings($idMapping){
-		$db = Factory::getContainer()->get(DatabaseInterface::class);
-		$apiId = (int) $this->getState('api.id');
-
-		if (empty($idMapping) || !$apiId) {
-			return;
-		}
-
-		try {
-			$db->transactionStart();
-
-			$query = $db->getQuery(true)
-				->delete($db->quoteName('#__vmmapicon_mapping'))
-				->where($db->quoteName('api_id') . ' = ' . $apiId);
-			$db->setQuery($query)->execute();
-
-			$table   = $db->quoteName('#__vmmapicon_mapping');
-			$columns = [
-				$db->quoteName('api_id'),
-				$db->quoteName('article_id'),
-				$db->quoteName('alias'),
-			];
-
-			$rows = [];
-			foreach ($idMapping as $articleId => $alias) {
-				$rows[] = $apiId . ', ' . (int) $articleId . ', ' . $db->quote((string) $alias);
-			}
-
-			$chunkSize = 500;
-			foreach (array_chunk($rows, $chunkSize) as $chunk) {
-				$query = $db->getQuery(true)
-					->insert($table)
-					->columns($columns);
-				foreach ($chunk as $row) {
-					$query->values($row);
-				}
-				$db->setQuery($query)->execute();
-			}
-
-			$db->transactionCommit();
-		} catch (\Throwable $e) {
-			$db->transactionRollback();
-			throw $e;
-		}
-	}
-
-
-
-    public function getItems($api = null, $limit = null, $start = null, String $template = null)
+    public function getItems($api = null, $limit = null, $start = null)
     {
 		$Itemid = $this->getState('Itemid');
         $id = (int) $this->getState('api.id');
@@ -121,52 +73,29 @@ class ApiblogModel extends ListModel
             return [];
         }
 
-        $raw = ApiHelper::getApiResult($cfg);
+        $raw = ApiHelper::getApiResult($cfg, $start, $limit);
 	    if (!$raw) { return []; }
 
         $decoded = json_decode($raw, true);
+
+		$pages = $decoded['meta']['total-pages'];
+		$total =$pages * $limit;
+		$this->setState('list.total', $total);
+
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
             return [];
         }
 
-		$itemIndex = 0;
-		$idMapping = [];
-
-		foreach ($decoded['data'] as $item) {
-			$categoryAlias = $decoded['data'][$itemIndex]['attributes']['categoryalias'];
-			$decoded['data'][$itemIndex]['attributes']['self_link'] = "index.php?option=com_vmmapicon&view=apisingle&id=" . $id . "&articleId=" . $item['id'] . '&alias=' . $item['attributes']['alias'] . '&Itemid=' . $Itemid . '&category=' . $categoryAlias;
-			$idMapping[$item['id']] = $item['attributes']['alias'];
-		$itemIndex++;
-		}
         $list = $decoded['data'] ?? [];
         if (!is_array($list)) { return []; }
 
-	    $total = count($list);
-	    $this->setState('list.total', $total);
-
-	    if ($limit === 0) {
-		    return $list;
-	    }
-
-		$items  = array_slice($list, $start, $limit);
-		$this->_setMappings($idMapping);
-	    return $items;
+	    return $list;
     }
 
-	public function getTotal(): int
-	{
-		$total = (int) $this->getState('list.total', 0);
-		if ($total === 0) {
-			$total = count($this->getItems());
-			$this->setState('list.total', $total);
-		}
-
-		return $total;
-	}
 	public function getPagination(): Pagination
 	{
 		return new Pagination(
-			$this->getTotal(),
+			$this->getState('list.total'),
 			(int) $this->getState('list.start', 0),
 			(int) $this->getState('list.limit', 0)
 		);

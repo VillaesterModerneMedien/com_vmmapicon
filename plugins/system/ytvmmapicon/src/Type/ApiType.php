@@ -25,14 +25,14 @@ class ApiType
                 'alias' => [ 'type' => 'String', 'metadata' => ['label' => 'Alias'] ],
                 'state' => [ 'type' => 'Int', 'metadata' => ['label' => 'State'] ],
                 'access' => [ 'type' => 'Int', 'metadata' => ['label' => 'Access'] ],
-                'created' => [ 'type' => 'String', 'metadata' => ['label' => 'Created'] ],
+                'created' => [ 'type' => 'String', 'metadata' => ['label' => 'Created', 'filters' => ['date']] ],
                 'created_by' => [ 'type' => 'String', 'metadata' => ['label' => 'Created By'] ],
-                'modified' => [ 'type' => 'String', 'metadata' => ['label' => 'Modified'] ],
+                'modified' => [ 'type' => 'String', 'metadata' => ['label' => 'Modified', 'filters' => ['date']] ],
                 'featured' => [ 'type' => 'Int', 'metadata' => ['label' => 'Featured'] ],
                 'language' => [ 'type' => 'String', 'metadata' => ['label' => 'Language'] ],
                 'hits' => [ 'type' => 'Int', 'metadata' => ['label' => 'Hits'] ],
-                'publish_up' => [ 'type' => 'String', 'metadata' => ['label' => 'Publish Up'] ],
-                'publish_down' => [ 'type' => 'String', 'metadata' => ['label' => 'Publish Down'] ],
+                'publish_up' => [ 'type' => 'String', 'metadata' => ['label' => 'Publish Up', 'filters' => ['date']] ],
+                'publish_down' => [ 'type' => 'String', 'metadata' => ['label' => 'Publish Down', 'filters' => ['date']] ],
                 'note' => [ 'type' => 'String', 'metadata' => ['label' => 'Note'] ],
 
                 // Bilder
@@ -50,11 +50,12 @@ class ApiType
 
                 // Weitere Felder
                 'version' => [ 'type' => 'Int', 'metadata' => ['label' => 'Version'] ],
-                'featured_up' => [ 'type' => 'String', 'metadata' => ['label' => 'Featured Up'] ],
-                'featured_down' => [ 'type' => 'String', 'metadata' => ['label' => 'Featured Down'] ],
+                'featured_up' => [ 'type' => 'String', 'metadata' => ['label' => 'Featured Up', 'filters' => ['date']] ],
+                'featured_down' => [ 'type' => 'String', 'metadata' => ['label' => 'Featured Down', 'filters' => ['date']] ],
                 'typeAlias' => [ 'type' => 'String', 'metadata' => ['label' => 'Type Alias'] ],
-                'text' => [ 'type' => 'String', 'metadata' => ['label' => 'Text'] ],
+                'text' => [ 'type' => 'String', 'metadata' => ['label' => 'Text', 'filters' => ['limit']] ],
                 'testfeld' => [ 'type' => 'String', 'metadata' => ['label' => 'Testfeld'] ],
+                'auszug' => [ 'type' => 'String', 'metadata' => ['label' => 'Auszug', 'filters' => ['limit']] ],
                 'bilder' => [
                     'type' => ['listOf' => 'ApiImage'],
                     'metadata' => [ 'label' => 'Bilder' ],
@@ -62,6 +63,8 @@ class ApiType
 
                 // Beziehungen
                 'category_id' => [ 'type' => 'String', 'metadata' => ['label' => 'Category ID'] ],
+                'category_name' => [ 'type' => 'String', 'metadata' => ['label' => 'Category Name'] ],
+                'category_alias' => [ 'type' => 'String', 'metadata' => ['label' => 'Category Alias'] ],
                 'author_id' => [ 'type' => 'String', 'metadata' => ['label' => 'Author ID'] ],
                 'tags_ids' => [ 'type' => ['listOf' => 'String'], 'metadata' => ['label' => 'Tag IDs'] ],
 
