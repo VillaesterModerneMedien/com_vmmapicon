@@ -44,6 +44,21 @@ class ApiHelper
         return $params;
     }
 
+	public static function getApiConfig($id = null)
+	{
+		if($id){
+			$app = Factory::getApplication();
+			$input = $app->input;
+			$mvcFactory = $app->bootComponent('com_vmmapicon')->getMVCFactory();
+
+			/** @var ApiModel $apiModel **/
+			$apiModel = $mvcFactory->createModel('Api', 'Administrator', ['ignore_request' => true]);
+			$result = $apiModel->getItem($id);
+
+			return $result;
+		}
+		return false;
+	}
 	public static function getCategoryNames(String $apiUrl, array $params): array{
 
 		$url = str_replace('/articles', '/categories', $apiUrl);
@@ -74,7 +89,7 @@ class ApiHelper
 		return  (array) $categories;
 
 	}
-    public static function getApiResult(object $apiConfig, int $start = 0, int $limit = 20): string
+    public static function getApiResult(object $apiConfig, int $start = 0, int $limit = 20, bool $singleTemplate = false): string
     {
 		$app = Factory::getApplication();
 		$input = $app->getInput();
@@ -94,9 +109,9 @@ class ApiHelper
             $url .= (str_contains($url, '?') ? '&' : '?') . $params['url'];
         }
 
-		if ($view === "apisingle"){
+		if ($view === "apisingle" && !$singleTemplate){
 			$url = $apiConfig->api_url . "/" . $input->get('articleId');
-		} else if($view === "apiblog" || $view === "article") {
+		} else if($view === "apiblog" || $view === "article" || ($view === "apisingle" && $singleTemplate)) {
 			$viewUrl = 'apisingle';
 			$url .= "&page[offset]=" . $start . "&page[limit]=" . $limit;
 		} else {
@@ -127,7 +142,7 @@ class ApiHelper
 	    $idMapping = [];
 		$blogId = self::_getBlogMenu($apiConfig->id);
 
-		if($view === 'apisingle'){
+		if($view === 'apisingle' && !$singleTemplate){
 			$categoryName = $categories[$responseArray['data']['relationships']['category']['data']['id']][0];
 			$categoryAlias = $categories[$responseArray['data']['relationships']['category']['data']['id']][1];
 			$responseArray['data']['attributes']['categoryname'] = $categoryName;

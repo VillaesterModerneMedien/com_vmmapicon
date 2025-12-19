@@ -42,7 +42,7 @@ public static function getSingle($id, int $index = 0, ?string $articleId = null)
 
     }
 
-    public static function getList($id, ?int $limit = null, int $offset = 0): array
+    public static function getList($id, ?int $limit = null, int $offset = 0, bool $singleTemplate = false): array
     {
         $model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
         $api = $model->getItem($id);
@@ -51,13 +51,13 @@ public static function getSingle($id, int $index = 0, ?string $articleId = null)
         }
 
 		$apiBlogModel = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Apiblog', 'Site');
-	    $items = $apiBlogModel->getItems($api->id, $limit, $offset);
+	    $items = $apiBlogModel->getItems($api->id, $limit, $offset, $singleTemplate);
 
 		$baseUrl = $api->api_url;
 	    $out = [];
 
 		foreach ($items as $item) {
-			$out[] = self::flattenRecord($item, $baseUrl);
+			$out[] = self::flattenRecord($item, $baseUrl, $singleTemplate);
 		}
 
         return $out;
@@ -119,10 +119,10 @@ public static function getSingle($id, int $index = 0, ?string $articleId = null)
         return $result;
     }
 
-    private static function flattenRecord(array $rec, ?string $baseUrl = null)
+    private static function flattenRecord(array $rec, ?string $baseUrl = null, bool $singleTemplate = false)
     {
 		$view = Factory::getApplication()->input->get('view');
-		if($view === 'apisingle') {
+		if($view === 'apisingle' && !$singleTemplate) {
 			$attributes = $rec;
 		} else {
 			$attributes = $rec['attributes'] ?? [];

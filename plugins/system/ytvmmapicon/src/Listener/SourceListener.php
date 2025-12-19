@@ -21,6 +21,7 @@ namespace Joomla\Plugin\System\Ytvmmapicon\Listener;
 
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiQueryType;
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiType;
+use Joomla\Plugin\System\Ytvmmapicon\Type\ApiConfigType;
 use Joomla\Plugin\System\Ytvmmapicon\Type\ApiImage;
 
 class SourceListener
@@ -29,6 +30,7 @@ class SourceListener
     {
         $source->objectType('ApiImage', ApiImage::config());
         $source->objectType('ApiType', ApiType::config());
+        $source->objectType('ApiConfigType', ApiConfigType::config());
         $source->queryType(ApiQueryType::config());
     }
 

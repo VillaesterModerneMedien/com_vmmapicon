@@ -19,8 +19,13 @@
 
 namespace Joomla\Plugin\System\Ytvmmapicon\Type;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Multilanguage;
+use Joomla\CMS\User\User;
 use Joomla\Plugin\System\Ytvmmapicon\ApiTypeProvider;
+use Villaester\Component\Vmmapicon\Site\Helper\ApiHelper;
+use function YOOtheme\app;
 
 
 class ApiQueryType
@@ -89,6 +94,39 @@ class ApiQueryType
                     ],
                     'extensions' => [ 'call' => __CLASS__ . '::resolve' ],
                 ],
+	            'menutitle' => [
+		            'type' => 'MenuItem',
+		            'metadata' => [
+			            'label' => 'Menü',
+			            'group' => 'Menü',
+		            ],
+		            'extensions' => [
+			            'call' => __CLASS__ . '::resolveMenu',
+		            ],
+	            ],
+	            'apiDetails' => [
+		            'type' => 'ApiConfigType',
+		            'args' => [
+			            'id' => [ 'type' => 'String' ],
+		            ],
+		            'metadata' => [
+			            'label' => 'ApiDetails',
+			            'group' => 'Apis',
+			            'fields' => [
+				            'id' => [
+					            'label' => 'Api-ID',
+					            'description' => 'Api auswählen',
+					            'type' => 'select',
+					            'options' => $apiOptions,
+					            'reload' => true,
+					            'refresh' => true,
+				            ],
+			            ],
+		            ],
+		            'extensions' => [
+			            'call' => __CLASS__ . '::resolveApiDetails',
+		            ],
+	            ],
 
             ]
         ];
@@ -96,7 +134,12 @@ class ApiQueryType
 	public static function getApiOptions()
 	{
 		$model = Factory::getApplication()->bootComponent('com_vmmapicon')->getMVCFactory()->createModel('Api', 'Administrator');
-		$options = $model->getApis();
+		$options [0]['value'] = '';
+		$options [0]['text'] = 'Template';
+		foreach ($model->getApis() as $api) {
+			array_push($options, ['value' => $api['value'], 'text' => $api['text']]);
+		}
+
 
 		return $options;
 	}
@@ -110,6 +153,12 @@ class ApiQueryType
 		$index = isset($args['index']) ? (int) $args['index'] : $input->get('index');
 		$articleId = isset($args['articleId']) ? (string) $args['articleId'] : $input->get('articleId');
 
+		if ($field === 'apiBlog' && $input->get('view') === 'apisingle'){
+			$limit = isset($args['limit']) ? (int) $args['limit'] : null;
+			$offset = isset($args['offset']) ? (int) $args['offset'] : 0;
+			$result = ApiTypeProvider::getList($id, $limit, $offset, true);
+			return $result;
+		}
 		if ($field === 'apiBlog') {
 			$limit = isset($args['limit']) ? (int) $args['limit'] : null;
 			$offset = isset($args['offset']) ? (int) $args['offset'] : 0;
@@ -122,6 +171,40 @@ class ApiQueryType
 		}
 		$result = ApiTypeProvider::getSingle($id, $index, $articleId);
 		return $result[0];
+	}
+	public static function resolveMenu(){
+		$app = Factory::getApplication();
+		$menu = $app->getMenu();
+		$active = $menu->getActive()->id;
+
+		$item = Factory::getApplication()
+			->getMenu('site')
+			->getItem($active ?? 0);
+
+		return $item &&
+		in_array($item->access, app(User::class)->getAuthorisedViewLevels()) &&
+		(!Multilanguage::isEnabled() ||
+			in_array($item->language, [Factory::getLanguage()->getTag(), '*']))
+			? $item
+			: null;
+
+	}
+
+	public static function resolveApiDetails($args, $item, $context, $info){
+		$input = Factory::getApplication()->getInput();
+		$apiId = false;
+		if(array_key_exists('id', $item)) {
+			$apiId = $item['id'];
+		}
+		if(!$apiId && $input->get('id')) {
+			$apiId = $input->get('id');
+		}
+		if(!$apiId) {
+			return false;
+		}
+		$params = ApiHelper::getApiConfig($apiId);
+
+		return $params;
 	}
 
 }

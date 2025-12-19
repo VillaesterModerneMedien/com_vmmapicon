@@ -48,7 +48,7 @@ class ApiblogModel extends ListModel
 
     }
 
-    public function getItems($api = null, $limit = null, $start = null)
+    public function getItems($api = null, $limit = null, $start = null, bool $singleTemplate = false)
     {
 		$Itemid = $this->getState('Itemid');
         $id = (int) $this->getState('api.id');
@@ -73,7 +73,7 @@ class ApiblogModel extends ListModel
             return [];
         }
 
-        $raw = ApiHelper::getApiResult($cfg, $start, $limit);
+        $raw = ApiHelper::getApiResult($cfg, $start, $limit, $singleTemplate);
 	    if (!$raw) { return []; }
 
         $decoded = json_decode($raw, true);
